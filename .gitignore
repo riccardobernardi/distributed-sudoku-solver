@@ -1,0 +1,5 @@
+/venv
+*.iml
+*.xml
+*.pyc
+/.DS_store

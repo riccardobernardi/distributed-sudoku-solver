@@ -118,19 +118,16 @@ class Sudodata():
 		for i in range(RANK*RANK):
 			for j in range(RANK*RANK):
 				if self.cell_rc(i, j) != other.cell_rc(i, j):
-					# print("??????????????????????")
-					# print(self.cell_rc(i, j))
-					# print(other.cell_rc(i, j))
-					# print("??????????????????????")
-					if str(self.cell_rc(i, j)) in self.anomaly:
-						if self.anomaly[str(self.cell_rc(i, j))]>5:
-							print("hai valori ambigui, fai una scelta, esempio:[1, 9, 6, 7]==[1, 6, 9, 7]")
-							self.ambiguity = True
-							return True
-					if str(self.cell_rc(i, j)) not in self.anomaly:
-						self.anomaly[str(self.cell_rc(i, j))] = 1
+					mm = str(self.cell_rc(i, j)).replace(" ","").replace(",","").replace("[","").replace("]","")
+					if mm not in self.anomaly:
+						self.anomaly[mm] = 1
+						#print("Ardeoooooooooo111:", mm)
 					else:
-						self.anomaly[str(self.cell_rc(i, j))] += 1
+						self.anomaly[mm] += 1
+						#print("Ardeoooooooooo222:",self.anomaly[mm])
+						if self.anomaly[mm] > 15:
+							print("hai valori ambigui, fai una scelta, esempio:[1, 9, 6, 7]==[1, 6, 9, 7]")
+							return True
 					return False
 		return True
 
@@ -208,7 +205,10 @@ def solve(matrix):
 
 		data.row_transformer(squeeze)
 
-		if tmp == data:
+		# this point is the most difficult of all the program PAY ATTENTION:
+		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
+		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
+		if data == tmp:
 			print("stopped at iteration:", i)
 			moves = i
 			break

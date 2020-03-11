@@ -3,6 +3,7 @@ import copy
 from pygraham import *
 
 RANK = 3
+DEBUG = 0
 
 def show(matrix):
 	for i in matrix:
@@ -12,6 +13,10 @@ def show(matrix):
 
 			print(" ",end='')
 		print()
+
+def dprint(*args):
+	if DEBUG==1:
+		print(*args)
 
 def squeze_all(matrix):
 	for i in range(len(matrix)):
@@ -141,8 +146,8 @@ def solve(matrix):
 
 	for i in range(1000):
 		tmp = copy.deepcopy(data)
-		#print("-----------------------------")
-		#print("box prop")
+		dprint("-----------------------------")
+		dprint("box prop")
 
 		def box_prop(box_indexes):
 			for r, c in box_indexes:
@@ -157,8 +162,8 @@ def solve(matrix):
 
 		data.box_transformer(box_prop)
 
-		#print("-----------------------------")
-		#print("col prop")
+		dprint("-----------------------------")
+		dprint("col prop")
 
 		def col_prop(col):
 			exclude = []
@@ -175,8 +180,8 @@ def solve(matrix):
 
 		data.col_transformer(col_prop)
 
-		#print("-----------------------------")
-		#print("row prop")
+		dprint("-----------------------------")
+		dprint("row prop")
 
 		def row_prop(row):
 			exclude = []
@@ -193,8 +198,8 @@ def solve(matrix):
 
 		data.row_transformer(row_prop)
 
-		#print("-----------------------------")
-		#print("squeezing")
+		dprint("-----------------------------")
+		dprint("squeezing")
 
 		def squeeze(row):
 			for i in range(len(row)):

@@ -35,8 +35,7 @@ def squeze_all(matrix):
 class Sudodata():
 	def __init__(self, matrix):
 		self.data = list(matrix)
-		self.anomaly = {}
-		self.ambiguity = False
+		self.cycles = {}
 
 	def cell_rc(self,r,c):
 		return self.data[r][c//RANK][c%RANK]
@@ -123,22 +122,54 @@ class Sudodata():
 		for i in range(RANK*RANK):
 			for j in range(RANK*RANK):
 				if self.cell_rc(i, j) != other.cell_rc(i, j):
-					mm = str(self.cell_rc(i, j)).replace(" ","").replace(",","").replace("[","").replace("]","")
-					if mm not in self.anomaly:
-						self.anomaly[mm] = 1
-						#print("Ardeoooooooooo111:", mm)
-					else:
-						self.anomaly[mm] += 1
-						#print("Ardeoooooooooo222:",self.anomaly[mm])
-						if self.anomaly[mm] > 15:
-							print("hai valori ambigui, fai una scelta, esempio:[1, 9, 6, 7]==[1, 6, 9, 7]")
-							return True
 					return False
 		return True
 
+	def check_cycles(self, other):
+		for i in range(RANK*RANK):
+			for j in range(RANK*RANK):
+				# ambiguity manifests when the cells are different but they are cyclic and at the end you cannot solve the cycle
+				# ambiguity/cycles are typical of difficult sudokus where there are too few known values
+				if self.cell_rc(i, j) != other.cell_rc(i, j):
+					mm = str(self.cell_rc(i, j)).replace(" ", "").replace(",", "").replace("[", "").replace("]", "")
+					if mm not in self.cycles:
+						self.cycles[mm] = 1
+					else:
+						self.cycles[mm] += 1
+						if self.cycles[mm] > 15:
+							print("hai cicli non risolvibili, opera una scelta")
+							return True
+		return False
+
+	def is_solved(self):
+		for i in range(RANK*RANK):
+			for j in range(RANK*RANK):
+				if type(self.cell_rc(i,j)) != int:
+					return False
+		return True
+
+	def hash(self):
+		hashed = ''
+		for i in range(RANK*RANK):
+			for j in range(RANK*RANK):
+				# hashing is not unique but it's okay
+				if type(self.cell_rc(i,j)) == int:
+					hashed += str(i)+str(j)+str(self.cell_rc(i,j))+"-"
+				else:
+					hashed += str(i) + str(j) + str(sum(self.cell_rc(i, j))) + "-"
+
+		return hashed[:len(hashed)-1]
+
+	def save(self):
+		pass
+
+	def choose(self):
+		pass
+
+
 def solve(matrix):
 	print("-----------------------------")
-	#print("setup")
+	dprint("setup")
 
 	data = Sudodata(matrix)
 	exclude = []
@@ -210,20 +241,39 @@ def solve(matrix):
 
 		data.row_transformer(squeeze)
 
+		if (data == tmp) and (not data.is_solved()):
+			# then you should take a decision to change this fact
+			data.save() # this should save the matrix
+			data.choose() # this should take a decision
+			# all matrices saved are encoded so there is history of them
+			# every hoistory-matrix is associated hashed so the comparation with a new one is very fast
+			# if no choice is new then you have to backtrack to the first one available going in the very past
+
+
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
 		if data == tmp:
-			print("stopped at iteration:", i)
+			dprint("stopped at iteration:", i)
+			moves = i
+			break
+
+		if data.check_cycles(tmp):
+			print("stopped at iteration: ", i,"for cycles")
 			moves = i
 			break
 
 		if i == 100:
-			print("ci sta mettendo troppo, siamo a 100 mosse")
+			dprint("ci sta mettendo troppo, siamo a 100 mosse")
+			pass
 
-	print("result is:")
+	dprint("result is:")
 
 	for row in data.row_iter():
-		print(row)
+		dprint(row)
 
-	print("solved in ", moves, "mosse")
+	if data.is_solved():
+		print("SOLVED in ", moves, "moves")
+		print(data.hash())
+	else:
+		print("NOT solved in ", moves, "moves")

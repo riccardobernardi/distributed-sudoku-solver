@@ -1,5 +1,4 @@
 import copy
-
 from pygraham import *
 
 RANK = 3
@@ -34,6 +33,8 @@ def squeze_all(matrix):
 
 class Sudodata():
 	def __init__(self, matrix):
+		self.history_moves = []
+		self.history_data = []
 		self.data = list(matrix)
 		self.cycles = {}
 
@@ -146,7 +147,38 @@ class Sudodata():
 			for j in range(RANK*RANK):
 				if type(self.cell_rc(i,j)) != int:
 					return False
+
+		for i in self.row_iter():
+			if len(set([i for i in range(1,10)]) & set(i)) != 9:
+				return False
+
+		for i in self.col_iter():
+			if len(set([i for i in range(1,10)]) & set(i)) != 9:
+				return False
+
+		for i in self.box_iter():
+			if len(set([i for i in range(1,10)]) & set(i)) != 9:
+				return False
+
 		return True
+
+	def duplicates(self):
+		for i in self.row_iter():
+			for j in range(1,10):
+				if len(list(i).filter(lambda x: (type(x)==int) & (x==j)))>1:
+					return True
+
+		for i in self.col_iter():
+			for j in range(1, 10):
+				if len(list(i).filter(lambda x: (type(x) == int) & (x == j))) > 1:
+					return True
+
+		for i in self.box_iter():
+			for j in range(1, 10):
+				if len(list(i).filter(lambda x: (type(x) == int) & (x == j))) > 1:
+					return True
+
+		return False
 
 	def hash(self):
 		hashed = ''
@@ -161,10 +193,23 @@ class Sudodata():
 		return hashed[:len(hashed)-1]
 
 	def save(self):
-		pass
+		self.history_data += [copy.deepcopy(self.data)]
 
 	def choose(self):
-		pass
+		for i in range(RANK*RANK):
+			for j in range(RANK*RANK):
+				if type(self.cell_rc(i,j)) != int:
+					for k in range(len(self.cell_rc(i,j))):
+						if type(self.cell_rc(i, j)) != int:
+							m = self.cell_rc(i, j)[k]
+							if (i,j,m) not in self.history_moves:
+								self.history_moves += [(i, j, m)]
+								self.assign_cell_rc(i,j,m)
+								print("scelgo:",(i, j, m))
+
+
+	def restore(self):
+		self.data = copy.deepcopy(self.history_data[-1])
 
 
 def solve(matrix):
@@ -243,12 +288,14 @@ def solve(matrix):
 
 		if (data == tmp) and (not data.is_solved()):
 			# then you should take a decision to change this fact
-			data.save() # this should save the matrix
+			data.save() # this should save the matrix and the move that im going to do
 			data.choose() # this should take a decision
+			while data.duplicates():
+				data.restore()
+				data.choose()
 			# all matrices saved are encoded so there is history of them
 			# every hoistory-matrix is associated hashed so the comparation with a new one is very fast
 			# if no choice is new then you have to backtrack to the first one available going in the very past
-
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
@@ -270,7 +317,7 @@ def solve(matrix):
 	dprint("result is:")
 
 	for row in data.row_iter():
-		dprint(row)
+		print(row)
 
 	if data.is_solved():
 		print("SOLVED in ", moves, "moves")

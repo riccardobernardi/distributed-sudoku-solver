@@ -30,7 +30,7 @@ def load_qqwing_sudokus():
 			# print(s)
 
 			for j,value in enumerate(s):
-				with open("./sudokus/qqwing_500_gen_" + str(j) + ".txt",mode="w") as f:
+				with open("./sudokus/"+ str(i).replace(".txt","") + "_" + str(j) + ".txt",mode="w") as f:
 					f.write(value+"\n")
 
 load_qqwing_sudokus()

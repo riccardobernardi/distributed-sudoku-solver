@@ -1,4 +1,6 @@
 import copy
+from time import sleep
+
 from pygraham import *
 
 RANK = 3
@@ -293,11 +295,16 @@ def propagate_constraints(data):
 def solve(matrix):
 	data = Sudodata(matrix)
 
-	for i in range(20): #and (not data.duplicates()) and (not data.void_elems()):
+	for i in range(3):
 		tmp = copy.deepcopy(data)
-		data = propagate_constraints(data)
 
-		if (data == tmp) and (not data.is_solved()):
+		for i in range(8):
+			data = propagate_constraints(data)
+
+		if data.is_solved():
+			return data.data
+
+		if data == tmp:
 			possibles = []
 			# we have to make a choice, use the smallest array of choices to cut out branches of the tree
 			for j in range(RANK * RANK):
@@ -307,10 +314,10 @@ def solve(matrix):
 
 			min_len = 1000
 			min_value = (0,0,[])
-			for k in possibles:
-				if len(k[2])<min_len:
-					min_len = len(k[2])
-					min_value = k
+			for k, value in enumerate(possibles):
+				if len(value[2])<min_len:
+					min_len = len(value[2])
+					min_value = value
 
 			for k in min_value[2]:
 				to_pass = copy.deepcopy(data)

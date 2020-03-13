@@ -48,58 +48,55 @@ def to_int(x):
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:30]
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:300]
 	alls = len(dataset)
 
 	for i in dataset:
 		# i is a txt file representing a sudoku in the correct format
-		try:
-			with open("./sudokus/" + i,mode="r") as f:
-				curr_sudoku = list([])
+		with open("./sudokus/" + i,mode="r") as f:
+			curr_sudoku = list([])
 
-				for j in f:
-					if j == "\n":
-						continue
-					if j == " \n":
-						continue
-					if j == " ":
-						continue
+			for j in f:
+				if j == "\n":
+					continue
+				if j == " \n":
+					continue
+				if j == " ":
+					continue
 
-					# one space between each number
-					if j[1] == " ":
-						curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
-						add = []
-						for i in range(RANK):
-							add += [curr_sudoku[-1][i*RANK:(i+1)*RANK]]
-						curr_sudoku[-1] = add
-
-
-					# one space every 3
-					if (j[1] != " ") and (j[3] == " "):
-						curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n","").split(" ")] ]
+				# one space between each number
+				if j[1] == " ":
+					curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
+					add = []
+					for i in range(RANK):
+						add += [curr_sudoku[-1][i*RANK:(i+1)*RANK]]
+					curr_sudoku[-1] = add
 
 
-					# no space never
-					if (j[1] != " ") and (j[3] != " "):
-						curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
-						add = []
-						for i in range(RANK):
-							add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
-						curr_sudoku[-1] = add
+				# one space every 3
+				if (j[1] != " ") and (j[3] == " "):
+					curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n","").split(" ")] ]
 
-				curr_sudoku = squeze_all(curr_sudoku)
-				result = solve(curr_sudoku)
 
-				if result!= -1:
-					#result = Sudodata(result)
-					#print("--------------------------")
-					#print(result)
-					solved += 1
-				count+=1
+				# no space never
+				if (j[1] != " ") and (j[3] != " "):
+					curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
+					add = []
+					for i in range(RANK):
+						add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
+					curr_sudoku[-1] = add
 
-				print("\r done", count, "out of", alls, end = '')
-		except:
-			print("An error occured at", i)
+			curr_sudoku = squeze_all(curr_sudoku)
+			result = solve(curr_sudoku)
+
+			if result!= -1:
+				#result = Sudodata(result)
+				#print("--------------------------")
+				#print(result)
+				solved += 1
+			count+=1
+
+			print("\r done", count, "out of", alls, end = '')
 
 	print()
 	print("Tot of correct over all:", solved,"/", alls)

@@ -223,6 +223,7 @@ class Sudodata():
 			s += str(i) + "\n"
 		return s
 
+response_matrix = -1
 
 def solve(matrix):
 	#print("-----------------------------")
@@ -317,9 +318,12 @@ def solve(matrix):
 				#print(k)
 				to_pass = copy.deepcopy(data)
 				to_pass.assign_cell_rc(min_value[0],min_value[1],k)
-				result = solve(to_pass.data)
-				if result!=-1:
-					return result
+				solve(to_pass.data)
+				#if result!=-1:
+					#return result
+					#global response_matrix
+					#response_matrix = data.data
+					#pass
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
@@ -348,7 +352,10 @@ def solve(matrix):
 	if data.is_solved():
 		#print("SOLVED in ", moves, "moves")
 		#print(data.hash())
-		return data.data
+		#return data.data
+		global response_matrix
+		response_matrix = data.data
 	else:
 		#print("NOT solved in ", moves, "moves")
-		return -1
+		#return -1
+		pass

@@ -47,9 +47,10 @@ def to_int(x):
 
 def main():
 	count = 0
-	alls = len(os.listdir("./sudokus"))
+	dataset = os.listdir("./sudokus")[:500]
+	alls = len(dataset)
 
-	for i in os.listdir("./sudokus"):
+	for i in dataset:
 		# i is a txt file representing a sudoku in the correct format
 		with open("./sudokus/" + i,mode="r") as f:
 			curr_sudoku = list([])
@@ -96,7 +97,7 @@ def main():
 	print()
 	#print("--------------------")
 	print("Tot of correct over all:", count,"/", alls)
-	print("Accuracy is: %.2f" % ((count/alls)*100))
+	print("Accuracy is: %.2f" % ((count/alls)*100), "%")
 
 
 init = time()

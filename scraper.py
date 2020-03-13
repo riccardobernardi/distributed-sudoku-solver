@@ -3,6 +3,7 @@ import urllib
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+import re
 
 def make_soup(url):
 	html = urlopen(url).read()
@@ -20,10 +21,22 @@ def get_txt(url):
 		return
 	else:
 		soup = make_soup(url)
-		#print(soup)
-		s = str(soup).split("========")
-		for i,value in enumerate(s):
-			if value[0] == "\n":
-				value = value[1:]
-			with open("./sudokus/" + "norvig_"+str(i)+".txt", mode="w") as f:
-				f.write(value)
+
+		if "Grid" in str(soup):
+			pattern = "Grid...(\r|\n)"
+			s = re.sub(pattern, "========\n", str(soup))
+			s = s.split("========")[1:]
+			# print(s)
+			for i, value in enumerate(s):
+				if value[0] == "\n":
+					value = value[1:]
+				with open("./sudokus/Grid_" + url.split("/")[-1].replace(".txt","")+"_" + str(i) + ".txt", mode="w") as f:
+					f.write(value)
+
+		if "========" in str(soup):
+			s = str(soup).split("========")
+			for i,value in enumerate(s):
+				if value[0] == "\n":
+					value = value[1:]
+				with open("./sudokus/Lines_" + "norvig_"+str(i)+".txt", mode="w") as f:
+					f.write(value)

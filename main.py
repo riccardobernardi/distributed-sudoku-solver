@@ -9,12 +9,17 @@ def split(word):
     return [char for char in word]
 
 def download_sudokus():
-	URLs=["http://lipas.uwasa.fi/~timan/sudoku/","http://norvig.com/easy50.txt"]
+	URLs=[
+		"http://lipas.uwasa.fi/~timan/sudoku/",
+		"http://norvig.com/easy50.txt",
+		"https://raw.githubusercontent.com/dimitri/sudoku/master/sudoku.txt",
+		"https://projecteuler.net/project/resources/p096_sudoku.txt"
+		  ]
 	for i in URLs:
 		print("downloading some sudokus from", i)
 		get_txt(i)
 
-#download_sudokus()
+download_sudokus()
 
 def to_int(x):
 	if x == '0':
@@ -23,6 +28,9 @@ def to_int(x):
 		return [1,2,3,4,5,6,7,8,9]
 	else:
 		return int(x)
+
+count = 0
+alls = len(os.listdir("./sudokus"))
 
 for i in os.listdir("./sudokus"):
 	# i is a txt file representing a sudoku in the correct format
@@ -63,6 +71,9 @@ for i in os.listdir("./sudokus"):
 		result = solve(curr_sudoku)
 		if result!= -1:
 			result = Sudodata(result)
+			count+=1
 		print("--------------------------")
 		print(result)
 
+print("--------------------")
+print("Tot of correct over all:", count,"/", alls)

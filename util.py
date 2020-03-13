@@ -300,17 +300,17 @@ def solve(matrix):
 		if (data == tmp) and (not data.is_solved()):
 			possibles = []
 			# we have to make a choice, use the smallest array of choices to cut out branches of the tree
-			for i in range(RANK * RANK):
-				for j in range(RANK * RANK):
-					if type(data.cell_rc(i, j)) != int:
-						possibles+=[(i,j,data.cell_rc(i, j))]
+			for j in range(RANK * RANK):
+				for k in range(RANK * RANK):
+					if type(data.cell_rc(j, k)) != int:
+						possibles+=[(j,k,data.cell_rc(j, k))]
 
 			min_len = 1000
 			min_value = (0,0,[])
-			for i in possibles:
-				if len(i[2])<min_len:
-					min_len = len(i[2])
-					min_value = i
+			for k in possibles:
+				if len(k[2])<min_len:
+					min_len = len(k[2])
+					min_value = k
 
 			for k in min_value[2]:
 				to_pass = copy.deepcopy(data)
@@ -322,8 +322,6 @@ def solve(matrix):
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
-		#print(data)
-		#print(tmp)
 		if data == tmp:
 			break
 

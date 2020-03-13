@@ -162,6 +162,12 @@ class Sudodata():
 
 		return True
 
+	def void_elems(self):
+		for i in self.row_iter():
+			if list(i).filter(lambda x: (type(x)!=int) and (len(x)==0)):
+				return True
+		return False
+
 	def duplicates(self):
 		for i in self.row_iter():
 			for j in range(1,10):
@@ -226,64 +232,70 @@ class Sudodata():
 	def set_matrix(self,matrix):
 		self.data = matrix
 
-def solve(matrix):
-	data = Sudodata(matrix)
+
+def propagate_constraints(data):
 	exclude = []
 
-	for i in range(1000):
+	def box_prop(box_indexes):
+		for r, c in box_indexes:
+			if type(data.cell_rc(r, c)) == int:
+				exclude.append(data.cell_rc(r, c))
+
+		for r, c in box_indexes:
+			if type(data.cell_rc(r, c)) != int:
+				data.assign_cell_rc(r, c, list(set(data.cell_rc(r, c)) - set(exclude)))
+
+		exclude.clear()
+
+	data.box_transformer(box_prop)
+
+	def col_prop(col):
+		exclude = []
+
+		for elem in col:
+			if type(elem) == int:
+				exclude.append(elem)
+
+		for i in range(len(col)):
+			if type(col[i]) != int:
+				col[i] = list(set(col[i]) - set(exclude))
+
+		return col
+
+	data.col_transformer(col_prop)
+
+	def row_prop(row):
+		exclude = []
+
+		for elem in row:
+			if type(elem) == int:
+				exclude.append(elem)
+
+		for i in range(len(row)):
+			if type(row[i]) != int:
+				row[i] = list(set(row[i]) - set(exclude))
+
+		return row
+
+	data.row_transformer(row_prop)
+
+	def squeeze(row):
+		for i in range(len(row)):
+			if (type(row[i]) != int) and (len(row[i]) == 1):
+				row[i] = row[i][0]
+
+		return row
+
+	data.row_transformer(squeeze)
+
+	return data
+
+def solve(matrix):
+	data = Sudodata(matrix)
+
+	while (not data.is_solved()): #and (not data.duplicates()) and (not data.void_elems()):
 		tmp = copy.deepcopy(data)
-
-		def box_prop(box_indexes):
-			for r, c in box_indexes:
-				if type(data.cell_rc(r,c)) == int:
-					exclude.append(data.cell_rc(r,c))
-
-			for r, c in box_indexes:
-				if type(data.cell_rc(r,c)) != int:
-					data.assign_cell_rc(r,c,list(set(data.cell_rc(r,c)) - set(exclude)))
-
-			exclude.clear()
-
-		data.box_transformer(box_prop)
-
-		def col_prop(col):
-			exclude = []
-
-			for elem in col:
-				if type(elem) == int:
-					exclude.append(elem)
-
-			for i in range(len(col)):
-				if type(col[i]) != int:
-					col[i] = list(set(col[i]) - set(exclude))
-
-			return col
-
-		data.col_transformer(col_prop)
-
-		def row_prop(row):
-			exclude = []
-
-			for elem in row:
-				if type(elem) == int:
-					exclude.append(elem)
-
-			for i in range(len(row)):
-				if type(row[i]) != int:
-					row[i] = list(set(row[i]) - set(exclude))
-
-			return row
-
-		data.row_transformer(row_prop)
-
-		def squeeze(row):
-			for i in range(len(row)):
-				if (type(row[i]) != int) and (len(row[i])==1):
-					row[i] = row[i][0]
-
-			return row
-
-		data.row_transformer(squeeze)
+		data = propagate_constraints(data)
 
 		if (data == tmp) and (not data.is_solved()):
 			possibles = []
@@ -307,15 +319,12 @@ def solve(matrix):
 				if result!=-1:
 					return result
 
-
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
-		if data == tmp:
-			break
+		#print(data)
+		#print(tmp)
+		#if data == tmp:
+		#	break
 
-
-	if data.is_solved():
-		return data.data
-	else:
-		return -1
+	return data.data

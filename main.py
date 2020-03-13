@@ -47,7 +47,8 @@ def to_int(x):
 
 def main():
 	count = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)
+	solved = 0
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:30]
 	alls = len(dataset)
 
 	for i in dataset:
@@ -90,17 +91,19 @@ def main():
 				result = solve(curr_sudoku)
 
 				if result!= -1:
-					result = Sudodata(result)
-					count+=1
-				#print("--------------------------")
-				#print(result)
+					#result = Sudodata(result)
+					# print("--------------------------")
+					# print(result)
+					solved += 1
+				count+=1
+
 				print("\r done", count, "out of", alls, end = '')
 		except:
 			print("An error occured at", i)
 
 	print()
-	print("Tot of correct over all:", count,"/", alls)
-	print("Accuracy is: %.2f" % ((count/alls)*100), "%")
+	print("Tot of correct over all:", solved,"/", alls)
+	print("Accuracy is: %.2f" % ((solved/alls)*100), "%")
 
 
 init = time()

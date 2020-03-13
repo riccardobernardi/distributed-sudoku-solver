@@ -2,7 +2,7 @@ import os
 from pygraham import *
 
 from scraper import get_txt
-from util import solve, show, squeze_all, RANK
+from util import solve, show, squeze_all, RANK, Sudodata
 
 
 def split(word):
@@ -60,4 +60,9 @@ for i in os.listdir("./sudokus"):
 				curr_sudoku[-1] = add
 
 		curr_sudoku = squeze_all(curr_sudoku)
-		solve(curr_sudoku)
+		result = solve(curr_sudoku)
+		if result!= -1:
+			result = Sudodata(result)
+		print("--------------------------")
+		print(result)
+

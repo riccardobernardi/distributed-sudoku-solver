@@ -35,7 +35,7 @@ class Sudodata():
 	def __init__(self, matrix):
 		self.history_moves = []
 		self.history_data = []
-		self.data = list(matrix)
+		self.data = matrix
 		self.cycles = {}
 
 	def cell_rc(self,r,c):
@@ -211,19 +211,31 @@ class Sudodata():
 	def restore(self):
 		self.data = copy.deepcopy(self.history_data[-1])
 
+	def __repr__(self):
+		s = ""
+		for i in self.row_iter():
+			s+=str(i)+"\n"
+		return s
+
+	def __str__(self):
+		s = ""
+		for i in self.row_iter():
+			s += str(i) + "\n"
+		return s
+
 
 def solve(matrix):
-	print("-----------------------------")
-	dprint("setup")
+	#print("-----------------------------")
+	#dprint("setup")
 
 	data = Sudodata(matrix)
 	exclude = []
-	moves = -1
+	#moves = -1#
 
 	for i in range(1000):
 		tmp = copy.deepcopy(data)
-		dprint("-----------------------------")
-		dprint("box prop")
+		#dprint("-----------------------------")
+		#dprint("box prop")
 
 		def box_prop(box_indexes):
 			for r, c in box_indexes:
@@ -238,8 +250,8 @@ def solve(matrix):
 
 		data.box_transformer(box_prop)
 
-		dprint("-----------------------------")
-		dprint("col prop")
+		#dprint("-----------------------------")
+		#dprint("col prop")
 
 		def col_prop(col):
 			exclude = []
@@ -256,8 +268,8 @@ def solve(matrix):
 
 		data.col_transformer(col_prop)
 
-		dprint("-----------------------------")
-		dprint("row prop")
+		##dprint("-----------------------------")
+		#dprint("row prop")
 
 		def row_prop(row):
 			exclude = []
@@ -274,8 +286,8 @@ def solve(matrix):
 
 		data.row_transformer(row_prop)
 
-		dprint("-----------------------------")
-		dprint("squeezing")
+		#dprint("-----------------------------")
+		#dprint("squeezing")
 
 		def squeeze(row):
 			for i in range(len(row)):
@@ -287,40 +299,56 @@ def solve(matrix):
 		data.row_transformer(squeeze)
 
 		if (data == tmp) and (not data.is_solved()):
-			# then you should take a decision to change this fact
-			data.save() # this should save the matrix and the move that im going to do
-			data.choose() # this should take a decision
-			while data.duplicates():
-				data.restore()
-				data.choose()
-			# all matrices saved are encoded so there is history of them
-			# every hoistory-matrix is associated hashed so the comparation with a new one is very fast
-			# if no choice is new then you have to backtrack to the first one available going in the very past
+			possibles = []
+			# we have to make a choice, use the smallest array of choices to cut out branches of the tree
+			for i in range(RANK * RANK):
+				for j in range(RANK * RANK):
+					if type(data.cell_rc(i, j)) != int:
+						possibles+=[(i,j,data.cell_rc(i, j))]
+
+			min_len = 1000
+			min_value = (0,0,[])
+			for i in possibles:
+				if len(i[2])<min_len:
+					min_len = len(i[2])
+					min_value = i
+
+			for k in min_value[2]:
+				#print(k)
+				to_pass = copy.deepcopy(data)
+				to_pass.assign_cell_rc(min_value[0],min_value[1],k)
+				result = solve(to_pass.data)
+				if result!=-1:
+					return result
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
 		if data == tmp:
-			dprint("stopped at iteration:", i)
-			moves = i
+			#dprint("stopped at iteration:", i)
+			#moves = i
 			break
+			#pass
 
-		if data.check_cycles(tmp):
-			print("stopped at iteration: ", i,"for cycles")
-			moves = i
-			break
+		# if data.check_cycles(tmp):
+		# 	print("stopped at iteration: ", i,"for cycles")
+		# 	moves = i
+		# 	break
+		# 	pass
 
-		if i == 100:
-			dprint("ci sta mettendo troppo, siamo a 100 mosse")
-			pass
+		# if i == 100:
+		# 	dprint("ci sta mettendo troppo, siamo a 100 mosse")
+		# 	pass
 
-	dprint("result is:")
+	#dprint("result is:")
 
-	for row in data.row_iter():
-		print(row)
+	# for row in data.row_iter():
+	# 	print(row)
 
 	if data.is_solved():
-		print("SOLVED in ", moves, "moves")
-		print(data.hash())
+		#print("SOLVED in ", moves, "moves")
+		#print(data.hash())
+		return data.data
 	else:
-		print("NOT solved in ", moves, "moves")
+		#print("NOT solved in ", moves, "moves")
+		return -1

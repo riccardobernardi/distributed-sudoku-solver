@@ -312,6 +312,9 @@ def solve(matrix):
 					if type(data.cell_rc(j, k)) != int:
 						possibles+=[(j,k,data.cell_rc(j, k))]
 
+			if len(possibles)==0:
+				return -1
+
 			min_len = 1000
 			min_value = (0,0,[])
 			for k, value in enumerate(possibles):
@@ -330,7 +333,7 @@ def solve(matrix):
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
 		if data == tmp:
-			break
+			return -1
 
 	if data.is_solved():
 		return data.data

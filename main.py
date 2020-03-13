@@ -48,7 +48,7 @@ def to_int(x):
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:300]
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)
 	alls = len(dataset)
 
 	for i in dataset:

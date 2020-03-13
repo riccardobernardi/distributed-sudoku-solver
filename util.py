@@ -1,10 +1,7 @@
 import copy
-from time import sleep
-
 from pygraham import *
 
 RANK = 3
-DEBUG = 0
 
 def show(matrix):
 	for i in matrix:
@@ -14,10 +11,6 @@ def show(matrix):
 
 			print(" ",end='')
 		print()
-
-def dprint(*args):
-	if DEBUG==1:
-		print(*args)
 
 def squeze_all(matrix):
 	for i in range(len(matrix)):
@@ -233,7 +226,6 @@ class Sudodata():
 
 	def set_matrix(self,matrix):
 		self.data = matrix
-
 
 def propagate_constraints(data):
 	exclude = []

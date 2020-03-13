@@ -3,6 +3,7 @@ from pygraham import *
 
 from scraper import get_txt
 from util import solve, show, squeze_all, RANK, Sudodata
+from time import time
 
 
 def split(word):
@@ -19,7 +20,21 @@ def download_sudokus():
 		print("downloading some sudokus from", i)
 		get_txt(i)
 
-download_sudokus()
+#download_sudokus()
+
+def load_qqwing_sudokus():
+	for i in os.listdir("./qqwing_500_gen_sudokus"):
+		# i is a txt file representing a sudoku in the correct format
+		with open("./qqwing_500_gen_sudokus/" + i, mode="r") as f:
+			s = str(f.read(-1)).split("\n\n\n")
+			# print(s)
+
+			for j,value in enumerate(s):
+				with open("./sudokus/qqwing_500_gen_" + str(j) + ".txt",mode="w") as f:
+					f.write(value+"\n")
+
+load_qqwing_sudokus()
+
 
 def to_int(x):
 	if x == '0':
@@ -29,51 +44,61 @@ def to_int(x):
 	else:
 		return int(x)
 
-count = 0
-alls = len(os.listdir("./sudokus"))
 
-for i in os.listdir("./sudokus"):
-	# i is a txt file representing a sudoku in the correct format
-	with open("./sudokus/" + i,mode="r") as f:
-		curr_sudoku = list([])
+def main():
+	count = 0
+	alls = len(os.listdir("./sudokus"))
 
-		for j in f:
-			if j == "\n":
-				continue
-			if j == " \n":
-				continue
-			if j == " ":
-				continue
+	for i in os.listdir("./sudokus"):
+		# i is a txt file representing a sudoku in the correct format
+		with open("./sudokus/" + i,mode="r") as f:
+			curr_sudoku = list([])
 
-			# one space between each number
-			if j[1] == " ":
-				curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
-				add = []
-				for i in range(RANK):
-					add += [curr_sudoku[-1][i*RANK:(i+1)*RANK]]
-				curr_sudoku[-1] = add
+			for j in f:
+				if j == "\n":
+					continue
+				if j == " \n":
+					continue
+				if j == " ":
+					continue
 
-
-			# one space every 3
-			if (j[1] != " ") and (j[3] == " "):
-				curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n","").split(" ")] ]
+				# one space between each number
+				if j[1] == " ":
+					curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
+					add = []
+					for i in range(RANK):
+						add += [curr_sudoku[-1][i*RANK:(i+1)*RANK]]
+					curr_sudoku[-1] = add
 
 
-			# no space never
-			if (j[1] != " ") and (j[3] != " "):
-				curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
-				add = []
-				for i in range(RANK):
-					add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
-				curr_sudoku[-1] = add
+				# one space every 3
+				if (j[1] != " ") and (j[3] == " "):
+					curr_sudoku += [ [list(split(i)).map(to_int) for i in k] for k in [j.replace("\n","").split(" ")] ]
 
-		curr_sudoku = squeze_all(curr_sudoku)
-		result = solve(curr_sudoku)
-		if result!= -1:
-			result = Sudodata(result)
-			count+=1
-		print("--------------------------")
-		print(result)
 
-print("--------------------")
-print("Tot of correct over all:", count,"/", alls)
+				# no space never
+				if (j[1] != " ") and (j[3] != " "):
+					curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
+					add = []
+					for i in range(RANK):
+						add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
+					curr_sudoku[-1] = add
+
+			curr_sudoku = squeze_all(curr_sudoku)
+			result = solve(curr_sudoku)
+			if result!= -1:
+				#result = Sudodata(result)
+				count+=1
+			#print("--------------------------")
+			#print(result)
+			print("\r done", count, "out of", alls, end = '')
+
+	print()
+	#print("--------------------")
+	print("Tot of correct over all:", count,"/", alls)
+	print("Accuracy is: %.2f" % ((count/alls)*100))
+
+
+init = time()
+main()
+print("Elapsed:", (time() - init)/60, "min")

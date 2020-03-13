@@ -223,20 +223,15 @@ class Sudodata():
 			s += str(i) + "\n"
 		return s
 
-response_matrix = -1
+	def set_matrix(self,matrix):
+		self.data = matrix
 
 def solve(matrix):
-	#print("-----------------------------")
-	#dprint("setup")
-
 	data = Sudodata(matrix)
 	exclude = []
-	#moves = -1#
 
 	for i in range(1000):
 		tmp = copy.deepcopy(data)
-		#dprint("-----------------------------")
-		#dprint("box prop")
 
 		def box_prop(box_indexes):
 			for r, c in box_indexes:
@@ -250,9 +245,6 @@ def solve(matrix):
 			exclude.clear()
 
 		data.box_transformer(box_prop)
-
-		#dprint("-----------------------------")
-		#dprint("col prop")
 
 		def col_prop(col):
 			exclude = []
@@ -269,9 +261,6 @@ def solve(matrix):
 
 		data.col_transformer(col_prop)
 
-		##dprint("-----------------------------")
-		#dprint("row prop")
-
 		def row_prop(row):
 			exclude = []
 
@@ -286,9 +275,6 @@ def solve(matrix):
 			return row
 
 		data.row_transformer(row_prop)
-
-		#dprint("-----------------------------")
-		#dprint("squeezing")
 
 		def squeeze(row):
 			for i in range(len(row)):
@@ -315,47 +301,21 @@ def solve(matrix):
 					min_value = i
 
 			for k in min_value[2]:
-				#print(k)
 				to_pass = copy.deepcopy(data)
 				to_pass.assign_cell_rc(min_value[0],min_value[1],k)
-				solve(to_pass.data)
-				#if result!=-1:
-					#return result
-					#global response_matrix
-					#response_matrix = data.data
-					#pass
+				result = solve(to_pass.data)
+				if result!=-1:
+					return result
+
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
 		if data == tmp:
-			#dprint("stopped at iteration:", i)
-			#moves = i
 			break
-			#pass
 
-		# if data.check_cycles(tmp):
-		# 	print("stopped at iteration: ", i,"for cycles")
-		# 	moves = i
-		# 	break
-		# 	pass
-
-		# if i == 100:
-		# 	dprint("ci sta mettendo troppo, siamo a 100 mosse")
-		# 	pass
-
-	#dprint("result is:")
-
-	# for row in data.row_iter():
-	# 	print(row)
 
 	if data.is_solved():
-		#print("SOLVED in ", moves, "moves")
-		#print(data.hash())
-		#return data.data
-		global response_matrix
-		response_matrix = data.data
+		return data.data
 	else:
-		#print("NOT solved in ", moves, "moves")
-		#return -1
-		pass
+		return -1

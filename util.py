@@ -293,7 +293,7 @@ def propagate_constraints(data):
 def solve(matrix):
 	data = Sudodata(matrix)
 
-	while (not data.is_solved()): #and (not data.duplicates()) and (not data.void_elems()):
+	for i in range(20): #and (not data.duplicates()) and (not data.void_elems()):
 		tmp = copy.deepcopy(data)
 		data = propagate_constraints(data)
 
@@ -324,7 +324,9 @@ def solve(matrix):
 		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
 		#print(data)
 		#print(tmp)
-		#if data == tmp:
-		#	break
+		if data == tmp:
+			break
 
-	return data.data
+	if data.is_solved():
+		return data.data
+	return -1

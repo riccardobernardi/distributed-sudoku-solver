@@ -48,7 +48,7 @@ def to_int(x):
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:30]
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:300]
 	alls = len(dataset)
 
 	for i in dataset:
@@ -92,8 +92,8 @@ def main():
 
 				if result!= -1:
 					#result = Sudodata(result)
-					# print("--------------------------")
-					# print(result)
+					#print("--------------------------")
+					#print(result)
 					solved += 1
 				count+=1
 

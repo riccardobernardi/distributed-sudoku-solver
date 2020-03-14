@@ -1,6 +1,8 @@
 from multiprocessing import cpu_count, Process
 from redis import Redis
 from rq import Worker
+import pickle
+pickle.HIGHEST_PROTOCOL = 2
 import util
 
 def process():

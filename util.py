@@ -1,26 +1,53 @@
 import copy
 from pygraham import *
-from redis import Redis
-import pickle
-pickle.HIGHEST_PROTOCOL = 2
-
-from rq import Queue
-import time
-
-REDIS_HOST = '192.168.1.237'
 RANK = 3
-DISTRIBUTE = False
+
+
+def parse_sudoku(f):
+	curr_sudoku = list([])
+
+	for j in f:
+		if j == "\n":
+			continue
+		if j == " \n":
+			continue
+		if j == " ":
+			continue
+
+		# one space between each number
+		if j[1] == " ":
+			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
+			add = []
+			for i in range(RANK):
+				add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
+			curr_sudoku[-1] = add
+
+		# one space every 3
+		if (j[1] != " ") and (j[3] == " "):
+			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
+
+		# no space never
+		if (j[1] != " ") and (j[3] != " "):
+			curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
+			add = []
+			for i in range(RANK):
+				add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
+			curr_sudoku[-1] = add
+
+	curr_sudoku = squeze_all(curr_sudoku)
+
+	return curr_sudoku
 
 
 def split(word):
-    return [char for char in word]
+	return [char for char in word]
 
 
 def to_int(x):
 	if x == '0':
 		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
 	if x == '.':
-		return [1,2,3,4,5,6,7,8,9]
+		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
 	else:
 		return int(x)
 
@@ -275,14 +302,20 @@ def propagate_constraints(data):
 def solve(matrix):
 	data = Sudodata(matrix)
 
-	for i in range(4): #4
+	if data.duplicates() or data.void_elems():
+		return -1
+
+	for i in range(4):  # 4
 		tmp = copy.deepcopy(data)
 
-		for i in range(8): #8
+		for i in range(8):  # 8
 			data = propagate_constraints(data)
 
 		if data.is_solved():
 			return data.data
+
+		if data.duplicates() or data.void_elems():
+			return -1
 
 		if data == tmp:
 			possibles = []
@@ -302,35 +335,12 @@ def solve(matrix):
 					min_len = len(value[2])
 					min_value = value
 
-
-			if DISTRIBUTE:
-				c = Redis(host='192.168.1.237')
-				q = Queue(connection=c)
-				jobs = []
-
-				for k in min_value[2]:
-					to_pass = copy.deepcopy(data)
-					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					jobs.append(q.enqueue(solve, to_pass.data))
-
-				count = 0
-				while any(not job.is_finished for job in jobs):
-					time.sleep(0.01)
-					count += 1
-					if count == 300:
-						break
-
-				for jj in jobs:
-					result = jj.return_value
-					if (result != -1) and (result is not None) and (result != "None"):
-						return result
-			else:
-				for k in min_value[2]:
-					to_pass = copy.deepcopy(data)
-					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					result = solve(to_pass.data)
-					if result != -1:
-						return result
+			for k in min_value[2]:
+				to_pass = copy.deepcopy(data)
+				to_pass.assign_cell_rc(min_value[0], min_value[1], k)
+				result = solve(to_pass.data)
+				if result != -1:
+					return result
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second

@@ -75,6 +75,9 @@ def setup():
 def pygraham_install():
     pool.sudo('pip3 install pygraham')
 
+def install_dill():
+    pool.sudo('pip3 install dill')
+
 def upload():
     # upload code to hosts
     pool.put('util.py', 'util.py')

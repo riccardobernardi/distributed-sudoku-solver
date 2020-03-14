@@ -46,7 +46,7 @@ def to_int(x):
 		return int(x)
 
 plagiarism = antiplagiarism("./sudokus",type=".txt", grams=2,threshold=0.9)
-print("number of files sudokus that are very similar",len(plagiarism))
+print("number of files sudokus that are very similar:",len(plagiarism))
 
 def main():
 	count = 0

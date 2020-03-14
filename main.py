@@ -4,6 +4,7 @@ from pygraham import *
 from scraper import get_txt
 from util import solve, show, squeze_all, RANK, Sudodata
 from time import time
+from antiplagiarism import antiplagiarism
 
 
 def split(word):
@@ -44,11 +45,13 @@ def to_int(x):
 	else:
 		return int(x)
 
+plagiarism = antiplagiarism("./sudokus",type=".txt", grams=2,threshold=0.9)
+print("number of files sudokus that are very similar",len(plagiarism))
 
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:30]
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)
 	alls = len(dataset)
 
 	for i in dataset:

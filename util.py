@@ -4,6 +4,19 @@ from pygraham import *
 RANK = 3
 
 
+def split(word):
+    return [char for char in word]
+
+
+def to_int(x):
+	if x == '0':
+		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
+	if x == '.':
+		return [1,2,3,4,5,6,7,8,9]
+	else:
+		return int(x)
+
+
 def show(matrix):
 	for i in matrix:
 		for j in i:

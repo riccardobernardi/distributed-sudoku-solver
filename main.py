@@ -1,49 +1,12 @@
 import os
 from pygraham import *
-
-from scraper import get_txt
-from util import solve, show, squeze_all, RANK, Sudodata
+from scraper import download_sudokus, load_qqwing_sudokus
+from util import solve, squeze_all, RANK, split, to_int
 from time import time
 from antiplagiarism import antiplagiarism
 
-
-def split(word):
-    return [char for char in word]
-
-def download_sudokus():
-	URLs=[
-		"http://lipas.uwasa.fi/~timan/sudoku/",
-		"http://norvig.com/easy50.txt",
-		"https://raw.githubusercontent.com/dimitri/sudoku/master/sudoku.txt",
-		"https://projecteuler.net/project/resources/p096_sudoku.txt"
-		  ]
-	for i in URLs:
-		print("downloading some sudokus from", i)
-		get_txt(i)
-
-#download_sudokus()
-
-def load_qqwing_sudokus():
-	for i in os.listdir("./qqwing_500_gen_sudokus"):
-		# i is a txt file representing a sudoku in the correct format
-		with open("./qqwing_500_gen_sudokus/" + i, mode="r") as f:
-			s = str(f.read(-1)).split("\n\n\n")
-			# print(s)
-
-			for j,value in enumerate(s):
-				with open("./sudokus/"+ str(i).replace(".txt","") + "_" + str(j) + ".txt",mode="w") as f:
-					f.write(value+"\n")
-
+download_sudokus()
 load_qqwing_sudokus()
-
-
-def to_int(x):
-	if x == '0':
-		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
-	if x == '.':
-		return [1,2,3,4,5,6,7,8,9]
-	else:
-		return int(x)
 
 plagiarism = antiplagiarism("./sudokus",type=".txt", grams=2,threshold=0.9)
 print("number of files sudokus that are very similar:",len(plagiarism))

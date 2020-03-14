@@ -40,3 +40,27 @@ def get_txt(url):
 					value = value[1:]
 				with open("./sudokus/Lines_" + "norvig_"+str(i)+".txt", mode="w") as f:
 					f.write(value)
+
+
+def download_sudokus():
+	URLs=[
+		"http://lipas.uwasa.fi/~timan/sudoku/",
+		"http://norvig.com/easy50.txt",
+		"https://raw.githubusercontent.com/dimitri/sudoku/master/sudoku.txt",
+		"https://projecteuler.net/project/resources/p096_sudoku.txt"
+		  ]
+	for i in URLs:
+		print("downloading some sudokus from", i)
+		get_txt(i)
+
+
+def load_qqwing_sudokus():
+	for i in os.listdir("./qqwing_500_gen_sudokus"):
+		# i is a txt file representing a sudoku in the correct format
+		with open("./qqwing_500_gen_sudokus/" + i, mode="r") as f:
+			s = str(f.read(-1)).split("\n\n\n")
+			# print(s)
+
+			for j,value in enumerate(s):
+				with open("./sudokus/"+ str(i).replace(".txt","") + "_" + str(j) + ".txt",mode="w") as f:
+					f.write(value+"\n")

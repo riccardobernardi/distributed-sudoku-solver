@@ -267,10 +267,10 @@ def propagate_constraints(data):
 def solve(matrix):
 	data = Sudodata(matrix)
 
-	for i in range(3):
+	for i in range(4):
 		tmp = copy.deepcopy(data)
 
-		for i in range(11):
+		for i in range(8):
 			data = propagate_constraints(data)
 
 		if data.is_solved():

@@ -57,6 +57,7 @@ def download_sudokus():
 def load_qqwing_sudokus():
 	for i in os.listdir("./qqwing_500_gen_sudokus"):
 		# i is a txt file representing a sudoku in the correct format
+		print("downloading sudokus from QQWing",i)
 		with open("./qqwing_500_gen_sudokus/" + i, mode="r") as f:
 			s = str(f.read(-1)).split("\n\n\n")
 			# print(s)

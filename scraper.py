@@ -50,14 +50,14 @@ def download_sudokus():
 		"https://projecteuler.net/project/resources/p096_sudoku.txt"
 		  ]
 	for i in URLs:
-		print("downloading some sudokus from", i)
+		print("downloading some sudokus from:", i)
 		get_txt(i)
 
 
 def load_qqwing_sudokus():
 	for i in os.listdir("./qqwing_500_gen_sudokus"):
 		# i is a txt file representing a sudoku in the correct format
-		print("downloading sudokus from QQWing",i)
+		print("downloading sudokus from QQWing:",i)
 		with open("./qqwing_500_gen_sudokus/" + i, mode="r") as f:
 			s = str(f.read(-1)).split("\n\n\n")
 			# print(s)

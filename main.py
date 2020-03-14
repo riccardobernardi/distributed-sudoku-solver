@@ -5,11 +5,11 @@ from util import solve, squeze_all, RANK, split, to_int
 from time import time
 from antiplagiarism import antiplagiarism
 
-download_sudokus()
-load_qqwing_sudokus()
+#download_sudokus()
+#load_qqwing_sudokus()
 
-plagiarism = antiplagiarism("./sudokus",type=".txt", grams=2,threshold=0.9)
-print("number of sudokus that are very similar:",len(plagiarism))
+#plagiarism = antiplagiarism("./sudokus",type=".txt", grams=2,threshold=0.9)
+#print("number of sudokus that are very similar:",len(plagiarism))
 
 def main():
 	count = 0

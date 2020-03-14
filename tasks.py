@@ -1,3 +1,5 @@
+REDIS_HOST = '192.168.1.237'
+
 import copy
 from pygraham import *
 from redis import Redis
@@ -314,7 +316,6 @@ def solve(matrix):
 				to_pass = copy.deepcopy(data)
 				to_pass.assign_cell_rc(min_value[0], min_value[1], k)
 				jobs.append(q.enqueue(solve, to_pass.data))
-				print("job", str(k) , "assigned")
 
 			while any(not job.is_finished for job in jobs):
 				time.sleep(0.01)

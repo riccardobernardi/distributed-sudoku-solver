@@ -7,6 +7,7 @@ pickle.HIGHEST_PROTOCOL = 2
 from rq import Queue
 import time
 
+REDIS_HOST = '192.168.1.237'
 RANK = 3
 
 
@@ -273,10 +274,10 @@ def propagate_constraints(data):
 def solve(matrix):
 	data = Sudodata(matrix)
 
-	for i in range(4):
+	for i in range(4): #4
 		tmp = copy.deepcopy(data)
 
-		for i in range(8):
+		for i in range(8): #8
 			data = propagate_constraints(data)
 
 		if data.is_solved():
@@ -307,24 +308,28 @@ def solve(matrix):
 			c = Redis(host='192.168.1.237')
 			q = Queue(connection=c)
 
-			t0 = time.time()
+			#t0 = time.time()
 			jobs = []
 
 			for k in min_value[2]:
 				to_pass = copy.deepcopy(data)
 				to_pass.assign_cell_rc(min_value[0], min_value[1], k)
 				jobs.append(q.enqueue(solve, to_pass.data))
-				print("job", str(k) , "assigned")
 
+			count = 0
 			while any(not job.is_finished for job in jobs):
+				#print(jobs)
 				time.sleep(0.01)
-			t1 = time.time()
+				count += 1
+				if count == 300:
+					break
+			#t1 = time.time()
 
-			print(t1 - t0)
+			# print(t1 - t0)
 
 			for jj in jobs:
 				result = jj.return_value
-				if result != -1:
+				if (result != -1) and (result is not None) and (result != "None"):
 					return result
 
 			###############################

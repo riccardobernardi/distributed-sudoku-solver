@@ -77,7 +77,7 @@ def pygraham_install():
 
 def upload():
     # upload code to hosts
-    pool.put('tasks.py', 'tasks.py')
+    pool.put('util.py', 'util.py')
     pool.put('worker.py', 'worker.py')
 
 def start():

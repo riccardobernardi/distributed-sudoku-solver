@@ -1,6 +1,7 @@
 from multiprocessing import cpu_count, Process
 from redis import Redis
 from rq import Worker
+import util
 
 def process():
     c = Redis(host='192.168.1.237')

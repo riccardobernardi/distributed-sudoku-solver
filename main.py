@@ -1,7 +1,7 @@
 import os
 from pygraham import *
 from scraper import download_sudokus, load_qqwing_sudokus
-from util import solve, squeze_all, RANK, split, to_int
+from util import solve, squeze_all, RANK, split, to_int, Sudodata
 from time import time
 from antiplagiarism import antiplagiarism
 

@@ -9,6 +9,7 @@ import time
 
 REDIS_HOST = '192.168.1.237'
 RANK = 3
+DISTRIBUTE = False
 
 
 def split(word):
@@ -302,45 +303,34 @@ def solve(matrix):
 					min_value = value
 
 
-			###############################
-			###############################
+			if DISTRIBUTE:
+				c = Redis(host='192.168.1.237')
+				q = Queue(connection=c)
+				jobs = []
 
-			c = Redis(host='192.168.1.237')
-			q = Queue(connection=c)
+				for k in min_value[2]:
+					to_pass = copy.deepcopy(data)
+					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
+					jobs.append(q.enqueue(solve, to_pass.data))
 
-			#t0 = time.time()
-			jobs = []
+				count = 0
+				while any(not job.is_finished for job in jobs):
+					time.sleep(0.01)
+					count += 1
+					if count == 300:
+						break
 
-			for k in min_value[2]:
-				to_pass = copy.deepcopy(data)
-				to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-				jobs.append(q.enqueue(solve, to_pass.data))
-
-			count = 0
-			while any(not job.is_finished for job in jobs):
-				#print(jobs)
-				time.sleep(0.01)
-				count += 1
-				if count == 300:
-					break
-			#t1 = time.time()
-
-			# print(t1 - t0)
-
-			for jj in jobs:
-				result = jj.return_value
-				if (result != -1) and (result is not None) and (result != "None"):
-					return result
-
-			###############################
-			###############################
-
-			# for k in min_value[2]:
-			# 	to_pass = copy.deepcopy(data)
-			# 	to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-			# 	result = solve(to_pass.data)
-			# 	if result != -1:
-			# 		return result
+				for jj in jobs:
+					result = jj.return_value
+					if (result != -1) and (result is not None) and (result != "None"):
+						return result
+			else:
+				for k in min_value[2]:
+					to_pass = copy.deepcopy(data)
+					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
+					result = solve(to_pass.data)
+					if result != -1:
+						return result
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second

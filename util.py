@@ -1,3 +1,6 @@
+import pickle
+pickle.HIGHEST_PROTOCOL = 2
+
 import copy
 from pygraham import *
 RANK = 3

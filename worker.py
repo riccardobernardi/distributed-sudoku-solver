@@ -1,9 +1,10 @@
+import pickle
+pickle.HIGHEST_PROTOCOL = 2
+
 from multiprocessing import cpu_count, Process
 from redis import Redis
 from rq import Worker
-import pickle
-pickle.HIGHEST_PROTOCOL = 2
-import util
+from util import solve
 
 def process():
     c = Redis(host='192.168.1.237')

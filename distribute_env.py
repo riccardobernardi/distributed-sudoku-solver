@@ -1,5 +1,7 @@
 from fabric.connection import Connection
 import threading
+import pickle
+pickle.HIGHEST_PROTOCOL = 2
 
 hosts = [
     'Rpi1',

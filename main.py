@@ -1,4 +1,6 @@
 import os
+import pickle
+pickle.HIGHEST_PROTOCOL = 2
 
 import rq
 from pygraham import *
@@ -27,27 +29,6 @@ def main():
 	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)
 	alls = len(dataset)
 
-
-	#######################################################
-	c = Redis(host='192.168.1.237')
-	q = Queue(connection=c)
-
-	t0 = time.time()
-	jobs = []
-	for i in range(10):
-		jobs.append(q.enqueue(split, "cane"))
-
-	while any(not job.is_finished for job in jobs):
-		time.sleep(0.01)
-	t1 = time.time()
-
-	print(t1 - t0)
-
-	for i in jobs:
-		print(i.return_value)
-	#######################################################
-
-
 	c = Redis(host='192.168.1.237')
 	q = Queue(connection=c)
 	jobs = []
@@ -63,27 +44,32 @@ def main():
 				result = solve(curr_sudoku)
 
 				if result != -1:
-					# result = Sudodata(result)
-					# print("--------------------------")
-					# print(result)
+					result = Sudodata(result)
+					print("--------------------------")
+					print(result)
 					solved += 1
 			count += 1
 
 			print("\r done", count, "out of", alls, end='')
 
 	print()
+	distributed_finished = 0
+	excluded = set()
 	if DISTRIBUTE:
-		count = 0
 		while any(not job.is_finished for job in jobs):
-			count += 1
+			for i in jobs:
+				if i.is_finished and (i.get_id() not in excluded):
+					excluded.add(i.get_id())
+					distributed_finished += 1
+				print("\r distributed_and_finished: ", distributed_finished, "out of", alls, end='')
 			sleep(0.01)
-			if count == 1000:
-				break
 
 		for jj in jobs:
 			result = jj.return_value
 			if (result != -1) and (result is not None) and (result != "None"):
-				return result
+				#return result
+				solved+=1
+		print()
 	print("Tot of correct over all:", solved, "/", alls)
 	print("Accuracy is: %.2f" % ((solved / alls) * 100), "%")
 

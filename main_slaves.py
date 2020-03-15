@@ -5,5 +5,6 @@ pickle.HIGHEST_PROTOCOL = 2
 def main():
 	upload()
 	start()
+	#shutdown()
 
 main()

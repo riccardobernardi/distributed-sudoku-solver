@@ -25,7 +25,7 @@ except:
 plagiarism = antiplagiarism("./sudokus", type=".txt", grams=2, threshold=0.9)
 print("number of sudokus that are very similar:", len(plagiarism), "(over 90% of similarity)")
 
-DISTRIBUTE = False
+DISTRIBUTE = True
 VIEW_RESULTS = False
 
 

@@ -313,6 +313,10 @@ def solve(matrix):
 
 		for i in range(8):  # 8
 			data = propagate_constraints(data)
+			if data.duplicates() or data.void_elems():
+				return -1
+			if data == tmp:
+				break
 
 		if data.is_solved():
 			return data.data

@@ -1,11 +1,13 @@
 import os
 import pickle
+
 pickle.HIGHEST_PROTOCOL = 2
 
 import rq
 from pygraham import *
 from redis import Redis
 import pickle
+
 pickle.HIGHEST_PROTOCOL = 2
 from rq import Queue
 import time
@@ -14,14 +16,17 @@ from util import solve, squeze_all, RANK, split, to_int, Sudodata, parse_sudoku
 from time import sleep
 from antiplagiarism import antiplagiarism
 
-download_sudokus()
-load_qqwing_sudokus()
+try:
+	download_sudokus()
+	load_qqwing_sudokus()
+except:
+	print("Some downloads went wrong...")
 
-plagiarism = antiplagiarism("./sudokus",type=".txt", grams=2,threshold=0.9)
-print("number of sudokus that are very similar:",len(plagiarism))
+plagiarism = antiplagiarism("./sudokus", type=".txt", grams=2, threshold=0.9)
+print("number of sudokus that are very similar:", len(plagiarism), "(over 90% of similarity)")
 
-DISTRIBUTE = True
-VIEW_RESULTS = False # possible only with distribute is False
+DISTRIBUTE = False
+VIEW_RESULTS = False
 
 
 def main():
@@ -35,24 +40,27 @@ def main():
 
 	for i in dataset:
 		# i is a txt file representing a sudoku in the correct format
-		with open("./sudokus/" + i, mode="r") as f:
-			curr_sudoku = parse_sudoku(f)
+		try:
+			with open("./sudokus/" + i, mode="r") as f:
+				curr_sudoku = parse_sudoku(f)
 
-			if DISTRIBUTE:
-				jobs.append(q.enqueue(solve, curr_sudoku))
-				print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
-			else:
-				result = solve(curr_sudoku)
+				if DISTRIBUTE:
+					jobs.append(q.enqueue(solve, curr_sudoku))
+					print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
+				else:
+					result = solve(curr_sudoku)
 
-				if result != -1:
-					if VIEW_RESULTS:
-						result = Sudodata(result)
-						print("--------------------------")
-						print(result)
-					solved += 1
-				print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", num_sudoku_avail, end='')
+					if result != -1:
+						if VIEW_RESULTS:
+							result = Sudodata(result)
+							print("--------------------------")
+							print(result)
+						solved += 1
+					print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", num_sudoku_avail, end='')
 
-			count += 1
+				count += 1
+		except:
+			print("A sudoku was wrongly formatted, in particular:", i)
 
 	if DISTRIBUTE:
 		print()
@@ -69,8 +77,8 @@ def main():
 		for jj in jobs:
 			result = jj.return_value
 			if (result != -1) and (result is not None) and (result != "None"):
-				#return result
-				solved+=1
+				# return result
+				solved += 1
 
 	print()
 	print("Tot of correct over all:", solved, "/", num_sudoku_avail)

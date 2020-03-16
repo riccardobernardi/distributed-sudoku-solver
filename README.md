@@ -43,7 +43,7 @@ Some libraries that were used in the assignment are previous projects of the aut
 
 
 
-- checking also the repetitions - antilagiarism
+- checking the repetitions - antilagiarism
 - some functional constructs - pygraham
 
 

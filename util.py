@@ -3,8 +3,8 @@ pickle.HIGHEST_PROTOCOL = 2
 
 import copy
 from pygraham import *
-RANK = 3
 
+RANK = 3
 MOST_CONSTRAINED = True
 
 
@@ -348,7 +348,7 @@ def solve(matrix):
 				for k in min_value[2]:
 					to_pass = copy.deepcopy(data)
 					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					for mm in range(5):
+					for mm in range(3):
 						to_pass = propagate_constraints(to_pass)
 					result = solve(to_pass.data)
 					if result != -1:
@@ -364,7 +364,7 @@ def solve(matrix):
 				for k in max_value[2]:
 					to_pass = copy.deepcopy(data)
 					to_pass.assign_cell_rc(max_value[0], max_value[1], k)
-					for mm in range(5):
+					for mm in range(3):
 						to_pass = propagate_constraints(to_pass)
 					result = solve(to_pass.data)
 					if result != -1:

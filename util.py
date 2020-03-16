@@ -5,6 +5,8 @@ import copy
 from pygraham import *
 RANK = 3
 
+MOST_CONSTRAINED = True
+
 
 def parse_sudoku(f):
 	curr_sudoku = list([])
@@ -335,19 +337,38 @@ def solve(matrix):
 			if len(possibles) == 0:
 				return -1
 
-			min_len = 1000
-			min_value = (0, 0, [])
-			for k, value in enumerate(possibles):
-				if len(value[2]) < min_len:
-					min_len = len(value[2])
-					min_value = value
+			if MOST_CONSTRAINED:
+				min_len = 1000
+				min_value = (0, 0, [])
+				for k, value in enumerate(possibles):
+					if len(value[2]) < min_len:
+						min_len = len(value[2])
+						min_value = value
 
-			for k in min_value[2]:
-				to_pass = copy.deepcopy(data)
-				to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-				result = solve(to_pass.data)
-				if result != -1:
-					return result
+				for k in min_value[2]:
+					to_pass = copy.deepcopy(data)
+					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
+					for mm in range(5):
+						to_pass = propagate_constraints(to_pass)
+					result = solve(to_pass.data)
+					if result != -1:
+						return result
+			else:
+				max_len = -1
+				max_value = (0, 0, [])
+				for k, value in enumerate(possibles):
+					if len(value[2]) > max_len:
+						max_len = len(value[2])
+						max_value = value
+
+				for k in max_value[2]:
+					to_pass = copy.deepcopy(data)
+					to_pass.assign_cell_rc(max_value[0], max_value[1], k)
+					for mm in range(5):
+						to_pass = propagate_constraints(to_pass)
+					result = solve(to_pass.data)
+					if result != -1:
+						return result
 
 		# this point is the most difficult of all the program PAY ATTENTION:
 		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second

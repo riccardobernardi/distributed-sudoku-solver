@@ -16,17 +16,20 @@ from util import solve, squeze_all, RANK, split, to_int, Sudodata, parse_sudoku
 from time import sleep
 from antiplagiarism import antiplagiarism
 
-try:
-	download_sudokus()
-	load_qqwing_sudokus()
-except:
-	print("Some downloads went wrong...")
-
-plagiarism = antiplagiarism("./sudokus", type=".txt", grams=2, threshold=0.9)
-print("number of sudokus that are very similar:", len(plagiarism), "(over 90% of similarity)")
-
-DISTRIBUTE = True
+DISTRIBUTE = False
 VIEW_RESULTS = False
+DOWNLOAD_DATA = False
+
+
+if DOWNLOAD_DATA:
+	try:
+		download_sudokus()
+		load_qqwing_sudokus()
+	except:
+		print("Some downloads went wrong...")
+
+	plagiarism = antiplagiarism("./sudokus", type=".txt", grams=2, threshold=0.9)
+	print("number of sudokus that are very similar:", len(plagiarism), "(over 90% of similarity)")
 
 
 def main():

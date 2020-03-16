@@ -70,6 +70,16 @@ Some libraries that were used in the assignment are previous projects of the aut
 
 
 
+| Num. Sudoku | Time in mins |                                                              |      |      |      |
+| ----------- | ------------ | ------------------------------------------------------------ | ---- | ---- | ---- |
+| 1899        | 26           |                                                              |      |      |      |
+| 1899        | 12           | pruning tree, adding more returns if data.void or data.duplicates |      |      |      |
+| 1899        | 7.9          | pruning tree, adding more propagation just before the recursion begins |      |      |      |
+| 1899        | 5            | distributing on the raspberry pi cluster                     |      |      |      |
+|             |              |                                                              |      |      |      |
+
+
+
 ## 8 Conclusions
 
 I think that in this case the knowledge of the domain was crucial and I was able to devise a good solution since first try because I'm passionate.

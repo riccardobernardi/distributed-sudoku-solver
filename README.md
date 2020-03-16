@@ -70,13 +70,13 @@ Some libraries that were used in the assignment are previous projects of the aut
 
 
 
-| Num. Sudoku | Time in mins |                                                              |      |      |      |
-| ----------- | ------------ | ------------------------------------------------------------ | ---- | ---- | ---- |
-| 1899        | 26           |                                                              |      |      |      |
-| 1899        | 12           | pruning tree, adding more returns if data.void or data.duplicates |      |      |      |
-| 1899        | 7.9          | pruning tree, adding more propagation just before the recursion begins |      |      |      |
-| 1899        | 5            | distributing on the raspberry pi cluster                     |      |      |      |
-|             |              |                                                              |      |      |      |
+| Num. Sudoku | Time in mins | Description of improvement                                   | Constants                | Sudoku/s   |
+| ----------- | ------------ | ------------------------------------------------------------ | ------------------------ | ---------- |
+| 1899        | 26mins       |                                                              | MOST_CONSTR              | 0.89secs   |
+| 1899        | 12mins       | pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR              | 0.38secs   |
+| 1899        | 7.9mins      | pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR              | 0.25secs   |
+| 1899        | 5mins        | distributing on the raspberry pi cluster                     | MOST_CONSTR, DISTRIBUTED | 0.0026secs |
+| 1899        | a lot        |                                                              | LEAST_CONSTR             | a lot      |
 
 
 
@@ -88,7 +88,7 @@ I think that in this case the knowledge of the domain was crucial and I was able
 
 ## 9 Bibliography
 
-
+- 
 
 
 

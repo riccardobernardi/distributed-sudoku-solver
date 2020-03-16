@@ -112,11 +112,6 @@ class Sudodata():
 	def triplet(self, r, t):
 		return list(self.data[r][t])
 
-	def cell_transform(self):
-		for i in range(RANK * RANK):
-			for j in range(RANK * RANK):
-				self.assign_cell_rc(i, j, int(self.cell_rc(i, j)))
-
 	def cell_iter(self):
 		for i in range(RANK * RANK):
 			for j in range(RANK * RANK):
@@ -348,7 +343,7 @@ def solve(matrix):
 				for k in min_value[2]:
 					to_pass = copy.deepcopy(data)
 					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					for mm in range(3):
+					for mm in range(5):
 						to_pass = propagate_constraints(to_pass)
 					result = solve(to_pass.data)
 					if result != -1:

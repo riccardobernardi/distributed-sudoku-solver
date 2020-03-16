@@ -20,9 +20,10 @@ The code and the report were entirely developed only by Riccardo Bernardi.
 
 ## 1 Background
 
-The sudoku is a challenging game about finding the proper numbers that can stay in acertain cell of a 9x9 square. A number is correct when it respects the constraints of:
+The sudoku is a challenging game about finding the proper numbers that can stay in a certain cell of a 9x9 square. A number is correct when it respects the constraints of:
 
-- only one number with same value on the same row, column and 3x3 box
+- 1 only one number with same value on the same row, column and 3x3 box
+- 2 on the same row, column and 3x3 box have to be every number from 1 to 9 in only one copy
 
 Some numbers at the start of the game are already provided on the sudoku and cannot be modified, you can only insert new numbers.
 
@@ -33,6 +34,8 @@ Constraint Propagation is about taking the rule as written before and building a
 The easiest puzzles will be solved by just doing the steps before but for the hardest ones you will need to apply **backtracking** that is about searching for all possible solutions in the puzzle until the only one solution is found. If a wrong one is found it is ignored.
 
 The author is a passionate sudoku solver and a passionate python programmer so you will find additions with respect to the basic assignment's requests.
+
+Some libraries that were used in the assignment are previous projects of the author published on PYPI, in these cases will be put references.
 
 
 

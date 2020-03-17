@@ -52,51 +52,13 @@ This part is not requested but was really important to check the performances of
 The code below connects to the sites with the most difficult sudoku that i was able to find:
 
 ```python
-def download_sudokus():
-	URLs=[
-		"http://lipas.uwasa.fi/~timan/sudoku/",
-		"http://norvig.com/easy50.txt",
-		"https://raw.githubusercontent.com/dimitri/sudoku/master/sudoku.txt",
-		"https://projecteuler.net/project/resources/p096_sudoku.txt"
-		  ]
-	for i in URLs:
-		print("downloading some sudokus from:", i)
-		get_txt(i)
+def download_sudokus(){...}
 ```
 
 The function get_txt works as below:
 
 ```python
-def get_txt(url):
-	if ".txt" not in url:
-		soup = make_soup(url)
-		txt_links = [link.get('href') for link in soup.findAll('a')]
-		for i,each in enumerate(txt_links):
-			if ("txt" in each) and ("_s" not in each):
-				filename = "lipas_" + each
-				urllib.request.urlretrieve(url+"/"+each, "./sudokus/" + filename)
-		return
-	else:
-		soup = make_soup(url)
-
-		if "Grid" in str(soup):
-			pattern = "Grid...(\r|\n)"
-			s = re.sub(pattern, "========\n", str(soup))
-			s = s.split("========")[1:]
-			# print(s)
-			for i, value in enumerate(s):
-				if value[0] == "\n":
-					value = value[1:]
-				with open("./sudokus/Grid_" + url.split("/")[-1].replace(".txt","")+"_" + str(i) + ".txt", mode="w") as f:
-					f.write(value)
-
-		if "========" in str(soup):
-			s = str(soup).split("========")
-			for i,value in enumerate(s):
-				if value[0] == "\n":
-					value = value[1:]
-				with open("./sudokus/Lines_" + "norvig_"+str(i)+".txt", mode="w") as f:
-					f.write(value)
+def get_txt(url){...}
 ```
 
 Given an url it tries to parse it in different ways. In the first case if the file is a webpage and not a txt file it will identify all the links to ".txt" files, in this case we assume that every file contains only one sudoku per file. Otherwise if the file is unique but contains many sudokus divided by some characters identified by mean of regular expressions we divide the sudokus into many different files.
@@ -104,17 +66,7 @@ Given an url it tries to parse it in different ways. In the first case if the fi
 Data is not only retrieved on the web but can also be loaded via a simple ".txt" file that contains many files, an example are:
 
 ```python
-def load_qqwing_sudokus():
-	for i in os.listdir("./qqwing_500_gen_sudokus"):
-		# i is a txt file representing a sudoku in the correct format
-		print("downloading sudokus from QQWing:",i)
-		with open("./qqwing_500_gen_sudokus/" + i, mode="r") as f:
-			s = str(f.read(-1)).split("\n\n\n")
-			# print(s)
-
-			for j,value in enumerate(s):
-				with open("./sudokus/"+ str(i).replace(".txt","") + "_" + str(j) + ".txt",mode="w") as f:
-					f.write(value+"\n")
+def load_qqwing_sudokus(){...}
 ```
 
 You can load a bunch of ".txt" all at the same time putting them in a precise folder. In this case the sudokus come from the website QQWing that created for me 1000 in a file and other 500 sudokus in another file. the settings that I put are that the puzzles should be divided into difficult and easy in a fair way, this is important because from this fact depends relevance of my next evaluations.
@@ -131,67 +83,162 @@ The downloading of the data can be activated or deactivated using: "DOWNLOAD_DAT
 
 ## 3 Data Model
 
-From the very first time I thought that a proper data model can be very helpful so I modelled a class that was able to mainly give me rows, columns and boxes easily but also that provides the ransformes to change values of the sudoku passing a callback/lambda. The peculiarity of this class is that I maintained the triplets of data by rows that simplifies the return of boxes.
+From the very first time I thought that a proper data model can be very helpful so I modelled a class that was able to mainly give me rows, columns and boxes easily but also that provided the transformes to change values of the sudoku passing a callback/lambda. The peculiarity of this class is that I maintained the triplets of data by rows that simplifies the return of boxes.
 
 It is important to clarify that I approached the problem substituting the 0's in the matrix passed by the user with a list [1...9] for every 0's. So propagating constraints for me is done via the elimination of the wrong choices in the list [1...9].
 
 Some basic methods, the method with no indication returns the value(it is a getter) instead if it is named "assign" then it is a setter.
 
 ```python
-def cell_rc(self, r, c)
-def assign_cell_rc(self, r, c, v)
-def cell_rtc(self, r, t, c)
-def column(self, c)
-def assign_column(self, c, v)
-def row(self, r)
-def assign_row(self, r, v)
-def triplet(self, r, t)
+def cell_rc(self, r, c){...}
+def assign_cell_rc(self, r, c, v){...}
+def cell_rtc(self, r, t, c){...}
+def column(self, c){...}
+def assign_column(self, c, v){...}
+def row(self, r){...}
+def assign_row(self, r, v){...}
+def triplet(self, r, t){...}
 ```
 
-
-
-Some iterators and transformers, the iterators actually are generators so they **yields** values, instead the transformers accepts as parameter only a **lambda** to modify the values. The most difficult transformer to be created was the box_transformer because it was more difficult to apply a function and then to remap all modification on the original matrix so as a workaround it will return the absolute indexes of the box.
+Some iterators and transformers, the iterators actually are generators so they **yield** values, instead the transformers accepts as parameter only a **lambda** to modify the values. The most difficult transformer to be created was the box_transformer because it was more difficult to apply a function and then to remap all modification on the original matrix so as a workaround it will return the absolute indexes of the box.
 
 ```python
-def cell_iter(self)
-def row_iter(self)
-def col_iter(self)
-def box_iter(self)
-def cell_transformer(self, l)
-def row_transformer(self, l)
-def col_transformer(self, l)
-def box_transformer(self, l)
+def cell_iter(self){...}
+def row_iter(self){...}
+def col_iter(self){...}
+def box_iter(self){...}
+def cell_transformer(self, l){...}
+def row_transformer(self, l){...}
+def col_transformer(self, l){...}
+def box_transformer(self, l){...}
 ```
-
-
 
 Some useful overrides are the ones here, in particular the iter will iterate by rows, this is useful for routines operations that do not need a strict ordering(e.g.: checking if a sudoku is solved can be more easily done via $\text{__iter__}$ since no particular order is required).
 
 ```python
-def __iter__(self)
-def __eq__(self, other)
-def __repr__(self)
-def __str__(self)
+def __iter__(self){...}
+def __eq__(self, other){...}
+def __repr__(self){...}
+def __str__(self){...}
 ```
-
-
 
 Some other methods that are needed are here, the only cryptic name is "void_elems" and this checks if there are void lists internally to the sudoku, if instead of a number is present a void list this means that all the possibilities were discarded so the recursion guessed the wrong value and the sudoku can be discarded. Hash do what everyone could expect, it produces a string hash not-unique for the specific matrix. For not-unique I mean that if a value is not found instead of a 0 there is a list [1...9] and it is hashed as the sum of itself.
 
 ```python
-def is_solved(self)
-def void_elems(self)
-def duplicates(self)
-def hash(self)
+def is_solved(self){...}
+def void_elems(self){...}
+def duplicates(self){...}
+def hash(self){...}
 ```
 
 
 
 ## 4 Constraint Propagation
 
+It is done via the method below:
+
+```python
+def propagate_constraints(data):
+	def box_prop(box_indexes){...}
+	data.box_transformer(box_prop)
+
+	def col_prop(col){...}
+	data.col_transformer(col_prop)
+
+	def row_prop(row){...}
+	data.row_transformer(row_prop)
+
+	def squeeze(row){...}
+	data.row_transformer(squeeze)
+
+	return data
+```
+
 
 
 ## 5 BackTracking
+
+
+
+The backtracking is done here:
+
+```python
+def solve(matrix):
+	data = Sudodata(matrix)
+
+	if data.duplicates() or data.void_elems():
+		return -1
+
+	for i in range(4):
+		tmp = copy.deepcopy(data)
+
+		for i in range(8):
+			data = propagate_constraints(data)
+			if data.duplicates() or data.void_elems():
+				return -1
+			if data == tmp:
+				break
+
+		if data.is_solved():
+			return data.data
+
+		if data.duplicates() or data.void_elems():
+			return -1
+
+		if data == tmp:
+			possibles = []
+			# we have to make a choice, use the smallest array of choices to cut out branches of the tree
+			for j in range(RANK * RANK):
+				for k in range(RANK * RANK):
+					if type(data.cell_rc(j, k)) != int:
+						possibles += [(j, k, data.cell_rc(j, k))]
+
+			if len(possibles) == 0:
+				return -1
+
+			if MOST_CONSTRAINED:
+				min_len = 1000
+				min_value = (0, 0, [])
+				for k, value in enumerate(possibles):
+					if len(value[2]) < min_len:
+						min_len = len(value[2])
+						min_value = value
+
+				for k in min_value[2]:
+					to_pass = copy.deepcopy(data)
+					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
+					for mm in range(5):
+						to_pass = propagate_constraints(to_pass)
+					result = solve(to_pass.data)
+					if result != -1:
+						return result
+			else:
+				max_len = -1
+				max_value = (0, 0, [])
+				for k, value in enumerate(possibles):
+					if len(value[2]) > max_len:
+						max_len = len(value[2])
+						max_value = value
+
+				for k in max_value[2]:
+					to_pass = copy.deepcopy(data)
+					to_pass.assign_cell_rc(max_value[0], max_value[1], k)
+					for mm in range(3):
+						to_pass = propagate_constraints(to_pass)
+					result = solve(to_pass.data)
+					if result != -1:
+						return result
+
+		# this point is the most difficult of all the program PAY ATTENTION:
+		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
+		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
+		if data == tmp:
+			return -1
+
+	if data.is_solved():
+		return data.data
+	return -1
+```
 
 
 

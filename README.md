@@ -160,21 +160,34 @@ def propagate_constraints(data):
 
 
 
-The backtracking is done here:
+The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. We take also a snapshot of the Sudodata object in that moment because if at the end no modification has occured then the propagation was useless so the backtracking is needed. 
+
+```
+
+```
+
+
 
 ```python
 def solve(matrix):
 	data = Sudodata(matrix)
 
-	if data.duplicates() or data.void_elems():
+	if data.is_solved():
+		return data.data
+	if data.duplicates_and_voids():
 		return -1
 
-	for i in range(4):
-		tmp = copy.deepcopy(data)
+	for i in range(RECURSION_TRIES):
+		if HASH_COMPARISON:
+			tmp = data.hash()
+		else:
+			tmp = copy.deepcopy(data)
 
-		for i in range(8):
+		for i in range(PROPAGATION_TRIES):
 			data = propagate_constraints(data)
-			if data.duplicates() or data.void_elems():
+			# if data.duplicates() or data.void_elems():
+			# 	return -1
+			if data.duplicates_and_voids():
 				return -1
 			if data == tmp:
 				break
@@ -182,7 +195,9 @@ def solve(matrix):
 		if data.is_solved():
 			return data.data
 
-		if data.duplicates() or data.void_elems():
+		# if data.duplicates() or data.void_elems():
+		# 	return -1
+		if data.duplicates_and_voids():
 			return -1
 
 		if data == tmp:
@@ -197,7 +212,7 @@ def solve(matrix):
 				return -1
 
 			if MOST_CONSTRAINED:
-				min_len = 1000
+				min_len = 1000 # arbitrary, no more than 9 can be presented
 				min_value = (0, 0, [])
 				for k, value in enumerate(possibles):
 					if len(value[2]) < min_len:
@@ -207,8 +222,10 @@ def solve(matrix):
 				for k in min_value[2]:
 					to_pass = copy.deepcopy(data)
 					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					for mm in range(5):
+					for mm in range(RECURSION_PROP):
 						to_pass = propagate_constraints(to_pass)
+					if to_pass.is_solved():
+						return to_pass.data
 					result = solve(to_pass.data)
 					if result != -1:
 						return result
@@ -223,8 +240,10 @@ def solve(matrix):
 				for k in max_value[2]:
 					to_pass = copy.deepcopy(data)
 					to_pass.assign_cell_rc(max_value[0], max_value[1], k)
-					for mm in range(3):
+					for mm in range(RECURSION_PROP):
 						to_pass = propagate_constraints(to_pass)
+					if to_pass.is_solved():
+						return to_pass.data
 					result = solve(to_pass.data)
 					if result != -1:
 						return result
@@ -242,7 +261,7 @@ def solve(matrix):
 
 
 
-## 6 Distributed Computation
+## 6 Distributed Computations 
 
 
 
@@ -250,13 +269,14 @@ def solve(matrix):
 
 
 
-| Num. Sudoku | Time in mins | Description of improvement                                   | Constants                | Sudoku/s   | Accuracy |
-| ----------- | ------------ | ------------------------------------------------------------ | ------------------------ | ---------- | -------- |
-| 1899sudokus | 26mins       | This was the first try                                       | MOST_CONSTR              | 0.89secs   | 100%     |
-| 1899sudokus | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR              | 0.38secs   | 100%     |
-| 1899sudokus | 7.9mins      | [ADD-2] pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR              | 0.25secs   | 100%     |
-| 1899sudokus | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED | 0.0026secs | 100%     |
-| 1899sudokus | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR             | a lot      | n.a.     |
+| Num. Sudoku | Time in mins | Description of improvement                                   | Constants                | seconds per sudoku | Accuracy |
+| ----------- | ------------ | ------------------------------------------------------------ | ------------------------ | ------------------ | -------- |
+| 1899sudokus | 26mins       | This was the first try                                       | MOST_CONSTR              | 0.89secs           | 100%     |
+| 1899sudokus | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR              | 0.38secs           | 100%     |
+| 1899sudokus | 7.9mins      | [ADD-2] pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR              | 0.25secs           | 100%     |
+| 1899sudokus | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED | 0.0026secs         | 100%     |
+| 1899sudokus | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR             | a lot              | n.a.     |
+| 1899sudokus | 8.50mins     | [ADD-4] equality of sudoku is performed using a custom hashing, not so efficient | HASH-COMPARISON          | 0.26secs           | 100%     |
 
 
 

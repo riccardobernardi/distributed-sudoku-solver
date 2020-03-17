@@ -9,7 +9,7 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 20
+PROPAGATION_TRIES = 5
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
@@ -390,12 +390,8 @@ def get_least_constrained_choice(possibles):
 
 def solve(data):
 	for i in range(PROPAGATION_TRIES):
-		tmp = copy.deepcopy(data)
 		data = propagate_constraints(data)
-		if data == tmp:
-			break
 
-	# check if propagation solved the matrix or the matrix is discardable
 	check = data.is_solved()
 	if check == CORRECT:
 		return data

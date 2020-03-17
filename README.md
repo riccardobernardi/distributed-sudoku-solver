@@ -162,30 +162,33 @@ The core of the backtracking is done via the function solve, it takes as input a
 
 ```python
 def solve(data):
-	for kk in range(PROPAGATION_TRIES):
-		data = propagate_constraints(data)
-
-	if data.is_solved():
+	check = data.is_solved()
+	if check == CORRECT:
 		return data
-	if data.duplicates() or data.void_elems():
+	if check == WRONG:
 		return -1
 
-	if not data.is_solved():
-		possibles = data.get_possibles()
+	for i in range(PROPAGATION_TRIES):
+		data = propagate_constraints(data)
 
-		if MOST_CONSTRAINED:
-			x, y, choices = get_most_constrained_choice(possibles)
-		else:
-			x, y, choices = get_least_constrained_choice(possibles)
+	possibles = data.get_possibles()
+  
+	if len(possibles) == 0:
+		return -1
 
-		for k in choices:
-			to_pass = copy.deepcopy(data)
-			to_pass.assign_cell_rc(x, y, k)
+	if MOST_CONSTRAINED:
+		x, y, choices = get_most_constrained_choice(possibles)
+	else:
+		x, y, choices = get_least_constrained_choice(possibles)
 
-			result = solve(to_pass)
+	for k in choices:
+		to_pass = copy.deepcopy(data)
+		to_pass.assign_cell_rc(x, y, k)
 
-			if result != -1:
-				return result
+		result = solve(to_pass)
+
+		if result != -1:
+			return result
 
 	return -1
 ```
@@ -196,7 +199,7 @@ def solve(data):
 
 
 
-## 7 Results
+## 7 Evaluation
 
 
 
@@ -211,9 +214,9 @@ def solve(data):
 | 1899sudokus | 12mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 12   | 0.38secs           | 100%     |
 | 1899sudokus | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20   | 0.38secs           | 100%     |
 | 1899sudokus | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8    | 0.38secs           | 100%     |
-| 1899sudokus | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 5    | 0.20secs           | 100%     |
-| 1899sudokus | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 4    | 0.22secs           | 100%     |
-| 1899sudokus | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 3    | 0.21secs           | 100%     |
+| 1899sudokus | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 5    | 0.20secs           | 100%     |
+| 1899sudokus | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 4    | 0.22secs           | 100%     |
+| 1899sudokus | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 3    | 0.21secs           | 100%     |
 | 1899sudokus | 5.65mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | PROPAGATION_TRIES = 5    | 0.18secs           | 100%     |
 
 
@@ -221,6 +224,10 @@ def solve(data):
 ## 8 Conclusions
 
 I think that in this case the knowledge of the domain was crucial and I was able to devise a good solution since first try because I'm passionate.
+
+The equality between two matrices is very costly in my case so i discarded that type of approach.
+
+Strangely putting a low number of loops for the propagation enhanced the performance, I think that this is because most of the puzzles are difficult and a long loop is very heavy inside recursions.
 
 
 

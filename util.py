@@ -1,4 +1,6 @@
 import pickle
+from time import sleep
+
 pickle.HIGHEST_PROTOCOL = 2
 
 import copy
@@ -6,6 +8,29 @@ from pygraham import *
 
 RANK = 3
 MOST_CONSTRAINED = True
+HASH_COMPARISON = False
+PROPAGATION_TRIES = 12
+
+
+def print_distributed_results(jobs,num_sudoku_avail):
+	solved = 0
+	print()
+	distributed_finished = 0
+	excluded = set()
+	while any(not job.is_finished for job in jobs):
+		for i in jobs:
+			if i.is_finished and (i.get_id() not in excluded):
+				excluded.add(i.get_id())
+				distributed_finished += 1
+			print("\r [DISTRIBUTED] Solved sudokus: ", distributed_finished, "out of", num_sudoku_avail, end='')
+		sleep(0.01)
+
+	for jj in jobs:
+		result = jj.return_value
+		if (result != -1) and (result is not None) and (result != "None"):
+			solved += 1
+
+	return solved
 
 
 def parse_sudoku(f):
@@ -163,11 +188,18 @@ class Sudodata():
 				yield self.cell_rc(i, j)
 
 	def __eq__(self, other):
-		for i in range(RANK * RANK):
-			for j in range(RANK * RANK):
-				if self.cell_rc(i, j) != other.cell_rc(i, j):
-					return False
-		return True
+		if other == -1:
+			return False
+		if HASH_COMPARISON:
+			if self.hash() == other:
+				return True
+			return False
+		else:
+			for i in range(RANK * RANK):
+				for j in range(RANK * RANK):
+					if self.cell_rc(i, j) != other.cell_rc(i, j):
+						return False
+			return True
 
 	def is_solved(self):
 		for i in range(RANK * RANK):
@@ -213,6 +245,26 @@ class Sudodata():
 
 		return False
 
+	def duplicates_and_voids(self):
+		for i in self.row_iter():
+			if list(i).filter(lambda x: (type(x) != int) and (len(x) == 0)):
+				return True
+			for j in range(1, 10):
+				if len(list(i).filter(lambda x: (type(x) == int) & (x == j))) > 1:
+					return True
+
+		for i in self.col_iter():
+			for j in range(1, 10):
+				if len(list(i).filter(lambda x: (type(x) == int) & (x == j))) > 1:
+					return True
+
+		for i in self.box_iter():
+			for j in range(1, 10):
+				if len(list(i).filter(lambda x: (type(x) == int) & (x == j))) > 1:
+					return True
+
+		return False
+
 	def hash(self):
 		hashed = ''
 		for i in range(RANK * RANK):
@@ -239,6 +291,16 @@ class Sudodata():
 
 	def set_matrix(self, matrix):
 		self.data = matrix
+
+	def get_possibles(self):
+		possibles = []
+		# we have to make a choice, use the smallest array of choices to cut out branches of the tree
+		for j in range(RANK * RANK):
+			for k in range(RANK * RANK):
+				if type(self.cell_rc(j, k)) != int:
+					possibles += [(j, k, self.cell_rc(j, k))]
+
+		return possibles
 
 
 def propagate_constraints(data):
@@ -299,78 +361,63 @@ def propagate_constraints(data):
 	return data
 
 
-def solve(matrix):
-	data = Sudodata(matrix)
+def get_most_constrained_choice(possibles):
+	min_len = 1000  # arbitrary, no more than 9 can be presented
+	min_value = (0, 0, [])
+	for k, value in enumerate(possibles):
+		if len(value[2]) < min_len:
+			min_len = len(value[2])
+			min_value = value
 
+	return min_value
+
+
+def get_least_constrained_choice(possibles):
+	max_len = -1  # arbitrary, no more than 9 can be presented
+	max_value = (0, 0, [])
+	for k, value in enumerate(possibles):
+		if len(value[2]) > max_len:
+			max_len = len(value[2])
+			max_value = value
+
+	return max_value
+
+
+def solve(data):
+	#check the recursion if data is solved or discardable
+	if data.is_solved():
+		return data
 	if data.duplicates() or data.void_elems():
 		return -1
 
-	for i in range(4):  # 4
-		tmp = copy.deepcopy(data)
+	for _ in range(PROPAGATION_TRIES):
+		data = propagate_constraints(data)
 
-		for i in range(8):  # 8
-			data = propagate_constraints(data)
-			if data.duplicates() or data.void_elems():
-				return -1
-			if data == tmp:
-				break
-
-		if data.is_solved():
-			return data.data
-
-		if data.duplicates() or data.void_elems():
-			return -1
-
-		if data == tmp:
-			possibles = []
-			# we have to make a choice, use the smallest array of choices to cut out branches of the tree
-			for j in range(RANK * RANK):
-				for k in range(RANK * RANK):
-					if type(data.cell_rc(j, k)) != int:
-						possibles += [(j, k, data.cell_rc(j, k))]
-
-			if len(possibles) == 0:
-				return -1
-
-			if MOST_CONSTRAINED:
-				min_len = 1000
-				min_value = (0, 0, [])
-				for k, value in enumerate(possibles):
-					if len(value[2]) < min_len:
-						min_len = len(value[2])
-						min_value = value
-
-				for k in min_value[2]:
-					to_pass = copy.deepcopy(data)
-					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					for mm in range(5):
-						to_pass = propagate_constraints(to_pass)
-					result = solve(to_pass.data)
-					if result != -1:
-						return result
-			else:
-				max_len = -1
-				max_value = (0, 0, [])
-				for k, value in enumerate(possibles):
-					if len(value[2]) > max_len:
-						max_len = len(value[2])
-						max_value = value
-
-				for k in max_value[2]:
-					to_pass = copy.deepcopy(data)
-					to_pass.assign_cell_rc(max_value[0], max_value[1], k)
-					for mm in range(3):
-						to_pass = propagate_constraints(to_pass)
-					result = solve(to_pass.data)
-					if result != -1:
-						return result
-
-		# this point is the most difficult of all the program PAY ATTENTION:
-		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
-		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
-		if data == tmp:
-			return -1
-
+	# check if propagation solved the matrix or the matrix is discardable
 	if data.is_solved():
-		return data.data
+		return data
+	if data.duplicates() or data.void_elems():
+		return -1
+
+	if not data.is_solved():
+		possibles = data.get_possibles()
+
+		# if no possibilities and not solved discard the recursion
+		if len(possibles) == 0:
+			return -1
+
+		if MOST_CONSTRAINED:
+			x, y, choices = get_most_constrained_choice(possibles)
+		else:
+			x, y, choices = get_least_constrained_choice(possibles)
+
+		for k in choices:
+			to_pass = copy.deepcopy(data)
+			to_pass.assign_cell_rc(x, y, k)
+
+			result = solve(to_pass)
+
+			if result != -1:
+				return result
+
 	return -1

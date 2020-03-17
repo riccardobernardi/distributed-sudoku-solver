@@ -160,102 +160,35 @@ def propagate_constraints(data):
 
 
 
-The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. We take also a snapshot of the Sudodata object in that moment because if at the end no modification has occured then the propagation was useless so the backtracking is needed. 
-
-```
-
-```
-
-
+The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. We take also a snapshot of the Sudodata object in that moment because if at the end no modification has occured then the propagation was useless so the backtracking is needed.
 
 ```python
-def solve(matrix):
-	data = Sudodata(matrix)
+def solve(data):
+	for kk in range(PROPAGATION_TRIES):
+		data = propagate_constraints(data)
 
 	if data.is_solved():
-		return data.data
-	if data.duplicates_and_voids():
+		return data
+	if data.duplicates() or data.void_elems():
 		return -1
 
-	for i in range(RECURSION_TRIES):
-		if HASH_COMPARISON:
-			tmp = data.hash()
+	if not data.is_solved():
+		possibles = data.get_possibles()
+
+		if MOST_CONSTRAINED:
+			x, y, choices = get_most_constrained_choice(possibles)
 		else:
-			tmp = copy.deepcopy(data)
+			x, y, choices = get_least_constrained_choice(possibles)
 
-		for i in range(PROPAGATION_TRIES):
-			data = propagate_constraints(data)
-			# if data.duplicates() or data.void_elems():
-			# 	return -1
-			if data.duplicates_and_voids():
-				return -1
-			if data == tmp:
-				break
+		for k in choices:
+			to_pass = copy.deepcopy(data)
+			to_pass.assign_cell_rc(x, y, k)
 
-		if data.is_solved():
-			return data.data
+			result = solve(to_pass)
 
-		# if data.duplicates() or data.void_elems():
-		# 	return -1
-		if data.duplicates_and_voids():
-			return -1
+			if result != -1:
+				return result
 
-		if data == tmp:
-			possibles = []
-			# we have to make a choice, use the smallest array of choices to cut out branches of the tree
-			for j in range(RANK * RANK):
-				for k in range(RANK * RANK):
-					if type(data.cell_rc(j, k)) != int:
-						possibles += [(j, k, data.cell_rc(j, k))]
-
-			if len(possibles) == 0:
-				return -1
-
-			if MOST_CONSTRAINED:
-				min_len = 1000 # arbitrary, no more than 9 can be presented
-				min_value = (0, 0, [])
-				for k, value in enumerate(possibles):
-					if len(value[2]) < min_len:
-						min_len = len(value[2])
-						min_value = value
-
-				for k in min_value[2]:
-					to_pass = copy.deepcopy(data)
-					to_pass.assign_cell_rc(min_value[0], min_value[1], k)
-					for mm in range(RECURSION_PROP):
-						to_pass = propagate_constraints(to_pass)
-					if to_pass.is_solved():
-						return to_pass.data
-					result = solve(to_pass.data)
-					if result != -1:
-						return result
-			else:
-				max_len = -1
-				max_value = (0, 0, [])
-				for k, value in enumerate(possibles):
-					if len(value[2]) > max_len:
-						max_len = len(value[2])
-						max_value = value
-
-				for k in max_value[2]:
-					to_pass = copy.deepcopy(data)
-					to_pass.assign_cell_rc(max_value[0], max_value[1], k)
-					for mm in range(RECURSION_PROP):
-						to_pass = propagate_constraints(to_pass)
-					if to_pass.is_solved():
-						return to_pass.data
-					result = solve(to_pass.data)
-					if result != -1:
-						return result
-
-		# this point is the most difficult of all the program PAY ATTENTION:
-		# if you do tmp==data then tmp that is temporary will store the anomalities so you will lose them in a second
-		# so the fact that data == tmp, the order of them is not randomic but well thought, dont move them
-		if data == tmp:
-			return -1
-
-	if data.is_solved():
-		return data.data
 	return -1
 ```
 

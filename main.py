@@ -12,7 +12,7 @@ pickle.HIGHEST_PROTOCOL = 2
 from rq import Queue
 import time
 from scraper import download_sudokus, load_qqwing_sudokus
-from util import solve, squeze_all, RANK, split, to_int, Sudodata, parse_sudoku
+from util import solve, squeze_all, RANK, split, to_int, Sudodata, parse_sudoku, print_distributed_results
 from time import sleep
 from antiplagiarism import antiplagiarism
 
@@ -49,39 +49,23 @@ def main():
 
 				if DISTRIBUTE:
 					jobs.append(q.enqueue(solve, curr_sudoku))
+					count += 1
 					print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
 				else:
-					result = solve(curr_sudoku)
+					result = solve(Sudodata(curr_sudoku))
 
 					if result != -1:
 						if VIEW_RESULTS:
-							result = Sudodata(result)
 							print("--------------------------")
 							print(result)
 						solved += 1
+					count += 1
 					print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", num_sudoku_avail, end='')
-
-				count += 1
 		except:
 			print("A sudoku was wrongly formatted, in particular:", i)
 
 	if DISTRIBUTE:
-		print()
-		distributed_finished = 0
-		excluded = set()
-		while any(not job.is_finished for job in jobs):
-			for i in jobs:
-				if i.is_finished and (i.get_id() not in excluded):
-					excluded.add(i.get_id())
-					distributed_finished += 1
-				print("\r [DISTRIBUTED] Solved sudokus: ", distributed_finished, "out of", num_sudoku_avail, end='')
-			sleep(0.01)
-
-		for jj in jobs:
-			result = jj.return_value
-			if (result != -1) and (result is not None) and (result != "None"):
-				# return result
-				solved += 1
+		solved = print_distributed_results(jobs,num_sudoku_avail)
 
 	print()
 	print("Tot of correct over all:", solved, "/", num_sudoku_avail)

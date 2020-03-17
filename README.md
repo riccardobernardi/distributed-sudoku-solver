@@ -79,6 +79,16 @@ The test said that ~150 sudokus were very similar, so at least 90% of similarity
 
 The downloading of the data can be activated or deactivated using: "DOWNLOAD_DATA = False".
 
+Other function that are used are:
+
+```python
+def squeze_all(matrix){...}
+def show(matrix){...}
+def parse_sudoku(f){...}
+```
+
+
+
 ## 3 Data Model
 
 From the very first time I thought that a proper data model can be very helpful so I modelled a class that was able to mainly give me rows, columns and boxes easily but also that provided the transformes to change values of the sudoku passing a callback/lambda. The peculiarity of this class is that I maintained the triplets of data by rows that simplifies the return of boxes.
@@ -197,27 +207,30 @@ def solve(data):
 
 ## 6 Distributed Computations 
 
+The pool of available sudokus are distributed over a finite set of raspberry pi that use the **solve** function shown above to compute the result
+
 
 
 ## 7 Evaluation
 
 
 
-| Num. Sudoku | Time in mins | Description of improvement                                   | Constants                | seconds per sudoku | Accuracy |
-| ----------- | ------------ | ------------------------------------------------------------ | ------------------------ | ------------------ | -------- |
-| 1899sudokus | 26mins       | This was the first try                                       | MOST_CONSTR              | 0.89secs           | 100%     |
-| 1899sudokus | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR              | 0.38secs           | 100%     |
-| 1899sudokus | 7.9mins      | [ADD-2] pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR              | 0.25secs           | 100%     |
-| 1899sudokus | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED | 0.0026secs         | 100%     |
-| 1899sudokus | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR             | a lot              | n.a.     |
-| 1899sudokus | 8.50mins     | [ADD-4] equality of sudoku is performed using a custom hashing, not so efficient | HASH-COMPARISON          | 0.26secs           | 100%     |
-| 1899sudokus | 12mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 12   | 0.38secs           | 100%     |
-| 1899sudokus | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20   | 0.38secs           | 100%     |
-| 1899sudokus | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8    | 0.38secs           | 100%     |
-| 1899sudokus | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 5    | 0.20secs           | 100%     |
-| 1899sudokus | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 4    | 0.22secs           | 100%     |
-| 1899sudokus | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 3    | 0.21secs           | 100%     |
-| 1899sudokus | 5.65mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | PROPAGATION_TRIES = 5    | 0.18secs           | 100%     |
+| Num. Sudoku | Time in mins | Description of improvement                                   | Constants                          | seconds per sudoku | Accuracy |
+| ----------- | ------------ | ------------------------------------------------------------ | ---------------------------------- | ------------------ | -------- |
+| 1899sudokus | 26mins       | This was the first try                                       | MOST_CONSTR                        | 0.89secs           | 100%     |
+| 1899sudokus | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR                        | 0.38secs           | 100%     |
+| 1899sudokus | 7.9mins      | [ADD-2] pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR                        | 0.25secs           | 100%     |
+| 1899sudokus | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED           | 0.16secs           | 100%     |
+| 1899sudokus | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR                       | a lot              | n.a.     |
+| 1899sudokus | 8.50mins     | [ADD-4] equality of sudoku is performed using a custom hashing, not so efficient | HASH-COMPARISON                    | 0.26secs           | 100%     |
+| 1899sudokus | 12mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 12             | 0.38secs           | 100%     |
+| 1899sudokus | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20             | 0.38secs           | 100%     |
+| 1899sudokus | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8              | 0.38secs           | 100%     |
+| 1899sudokus | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 5              | 0.20secs           | 100%     |
+| 1899sudokus | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 4              | 0.22secs           | 100%     |
+| 1899sudokus | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 3              | 0.21secs           | 100%     |
+| 1899sudokus | 5.65mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | PROPAGATION_TRIES = 5              | 0.18secs           | 100%     |
+| 1899sudokus | 3.86mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | DISTRIBUTED, PROPAGATION_TRIES = 5 | 0.12secs           | 100%     |
 
 
 
@@ -227,7 +240,7 @@ I think that in this case the knowledge of the domain was crucial and I was able
 
 The equality between two matrices is very costly in my case so i discarded that type of approach.
 
-Strangely putting a low number of loops for the propagation enhanced the performance, I think that this is because most of the puzzles are difficult and a long loop is very heavy inside recursions.
+Strangely putting a low number of loops for the propagation enhanced the performance, I think that this is because most of the puzzles are difficult and a long loop is very heavy inside recursions. Optimal values are between 3 and 5.
 
 
 

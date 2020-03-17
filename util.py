@@ -9,7 +9,7 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 5
+PROPAGATION_TRIES = 4
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
@@ -30,7 +30,7 @@ def print_distributed_results(jobs, num_sudoku_avail):
 
 	for jj in jobs:
 		result = jj.return_value
-		if (result != -1) and (result is not None) and (result != "None"):
+		if (result != -1) and (result is not None) and (type(result) != str):
 			solved += 1
 
 	return solved

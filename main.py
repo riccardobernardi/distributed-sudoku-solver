@@ -15,7 +15,7 @@ from scraper import download_sudokus, load_qqwing_sudokus
 from util import solve, Sudodata, parse_sudoku, print_distributed_results
 from antiplagiarism import antiplagiarism
 
-DISTRIBUTE = False
+DISTRIBUTE = True
 VIEW_RESULTS = False
 DOWNLOAD_DATA = False
 
@@ -47,7 +47,7 @@ def main():
 				curr_sudoku = parse_sudoku(f)
 
 				if DISTRIBUTE:
-					jobs.append(q.enqueue(solve, curr_sudoku))
+					jobs.append(q.enqueue(solve, Sudodata(curr_sudoku)))
 					count += 1
 					print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
 				else:

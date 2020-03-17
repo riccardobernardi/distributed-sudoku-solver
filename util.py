@@ -9,7 +9,7 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 4
+PROPAGATION_TRIES = 12
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
@@ -363,6 +363,7 @@ def propagate_constraints(data):
 
 	data.row_transformer(squeeze)
 
+	#print(data)
 	return data
 
 

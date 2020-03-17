@@ -10,7 +10,7 @@ The code and the report were entirely developed only by Riccardo Bernardi.
 
 The author developed a library to program in a more functional way in python called pygraham so it is possible to find "list(...).map(...).reduce(...)". This construct is correct and it is introduced thanks to pygraham library, freely available on PyPI. It is present in the bibliography[4] an article that explains it.
 
-Some libraries that were used in the assignment are previous projects of the author published on PyPI, in these cases will be put references.
+In general: some libraries that were used in the assignment are previous projects of the author published on PyPI, in these cases will be put references to the docs.
 
 ## Table of Contents
 
@@ -36,6 +36,8 @@ Some numbers at the start of the game are already provided on the sudoku and can
 Another important notice about sudokus is that a sudoku that is correct should have exactly one solution, this is very important because asserting this fact will allow us to search for a solution with the certainty of converging.
 
 Constraint Propagation is about taking the rule as written before and building a method that checks that fact but my implementation works in a different way, it prunes wrong solutions from possible ones. In particular at the very start every 0 cell(void cells to be calculated) are substituted by an array [1...9] and the **propagate_constraints** function will prune wrong ones.
+
+In general we can implement the constrains propagation using the most-constrained strategy or the least one. It is known that the most-constrained strategy helps pruning the tree of recursion in the backtracking so it is the best choice[5].
 
 Both **most-constrained** and **least-constrained** are implemented because of completeness but it is obvious and it is also proven by the empirical results that **most-constrained** is the best strategy(also used in the real game when done using pencil) because in the recursion you will find with more cells completed. This is because the only case in which you use backtracking is when the constraints become **cyclic** so no solution can be found with only the **propagation**, in this case solving one little constraint means that at least another one or more cells will be easily completed by the propagation in the recursion. Instead if you use the least constrained strategy probably you will complete only one cell with probably the wrong answer and you will need to have many and many recursions before knowing that your initial choice was wrong and so you need to close the stack and retry the same non-efficient strategy.
 
@@ -108,7 +110,7 @@ def assign_row(self, r, v){...}
 def triplet(self, r, t){...}
 ```
 
-Some iterators and transformers, the iterators actually are generators so they **yield** values, instead the transformers accepts as parameter only a **lambda** to modify the values. The most difficult transformer to be created was the box_transformer because it was more difficult to apply a function and then to remap all modification on the original matrix so as a workaround it will return the absolute indexes of the box.
+Some iterators and transformers, the iterators actually are generators so they **yield** values, instead the transformers accepts as parameter only a **lambda** to modify the values. The most difficult transformer to be created was the box_transformer because it was more difficult to apply a function and then to remap all modification on the original matrix so as a workaround it will give the absolute indexes of the box to the lambda that will use them.
 
 ```python
 def cell_iter(self){...}
@@ -143,7 +145,7 @@ def hash(self){...}
 
 ## 4 Constraint Propagation
 
-It is done via the method below:
+All the job of constraints propagation is done through the function below taht takes the Sudodata and returns it modified. All the mechnism works creating proper callbacks that will do the simplifications on the data and then it is called into a proper transformer that will apply such modifications to the existent sudoku.
 
 ```python
 def propagate_constraints(data):
@@ -160,6 +162,87 @@ def propagate_constraints(data):
 	data.row_transformer(squeeze)
 
 	return data
+```
+
+One important part is the squeezing operation. At a certain moment in a certain cell will remain only one value and so you want that such value trasforms from a vector of possible values into the actual value.
+
+An Example:
+
+1)
+
+```
+[3, 7, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 6]
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, 6, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 1, 2]
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 9, 1, 7, 5, [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 1, 5, 4, [1, 2, 3, 4, 5, 6, 7, 8, 9], 7, [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 3, [1, 2, 3, 4, 5, 6, 7, 8, 9], 7, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], 5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6, 3, 8, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+[[1, 2, 3, 4, 5, 6, 7, 8, 9], 6, 4, 9, 8, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+[5, 9, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 2, 6, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9]]
+[2, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6, 4]
+```
+
+2)
+
+```
+[3, 7, [8, 1, 2, 9], 5, 4, 2, [8, 9, 4], [8, 9, 4], 6]
+[[8, 9, 4], [8, 4], [8, 9, 5], 3, 6, 7, [8, 9, 4], 1, 2]
+[[8, 4, 6], [8, 2, 4], [8, 2, 6], [8, 2, 4], 9, 1, 7, 5, [8, 3]]
+[[8, 9, 6], [8, 2], [8, 9, 2, 6], 1, 5, 4, [8, 9, 2, 3], 7, [8, 9, 3]]
+[[8, 1, 4, 9], [8, 1, 2, 4], 3, 2, 7, [9, 2], 6, [8, 9, 2, 4], [8, 1, 5, 9]]
+[[1, 4, 9, 7], 5, [1, 2, 9, 7], 6, 3, 8, [1, 2, 4, 9], [9, 2, 4], [1, 9]]
+[[1, 7], 6, 4, 9, 8, [3, 7], [1, 2, 3, 5], [2, 3], [1, 3, 5, 7]]
+[5, 9, [8, 1, 7], [4, 7], 2, 6, [8, 1, 3], [8, 3], [8, 1, 3, 7]]
+[2, [8, 1, 3], [8, 1, 7], 7, 1, 5, [8, 1, 3, 9], 6, 4]
+```
+
+3)
+
+```
+[3, 7, [8, 1, 9], 5, 4, 2, [8, 9], [8, 9], 6]
+[[8, 9, 4], [8, 4], [8, 9, 5], 3, 6, 7, [8, 9, 4], 1, 2]
+[[8, 4, 6], [8, 2, 4], [8, 2, 6], 8, 9, 1, 7, 5, [8, 3]]
+[[8, 9, 6], [8, 2], [8, 9, 2, 6], 1, 5, 4, [8, 9, 2, 3], 7, [8, 9, 3]]
+[[8, 1, 4, 9], [8, 1, 4], 3, 2, 7, 9, 6, [8, 9, 4], [8, 1, 5, 9]]
+[[1, 4, 9, 7], 5, [1, 2, 9, 7], 6, 3, 8, [1, 2, 4, 9], [9, 2, 4], [1, 9]]
+[[1, 7], 6, 4, 9, 8, 3, [1, 2, 3, 5], [2, 3], [1, 3, 5, 7]]
+[5, 9, [8, 1, 7], 4, 2, 6, [8, 1, 3], [8, 3], [8, 1, 3, 7]]
+[2, [8, 3], 8, 7, 1, 5, [8, 9, 3], 6, 4]
+```
+
+[...] excluded some computed values
+
+11)
+
+```
+[3, 7, 1, 5, 4, 2, 8, 9, 6]
+[9, 8, 5, 3, 6, 7, 4, 1, 2]
+[6, 4, [2, 6], 8, 9, 1, 7, 5, 3]
+[[8, 6], 2, 6, 1, 5, 4, 3, 7, 9]
+[4, 1, 3, 2, 7, 9, 6, 8, [1, 5]]
+[7, 5, 9, 6, 3, 8, [1, 2], 4, 1]
+[1, 6, 4, 9, 8, 3, 5, 2, [5, 7]]
+[5, 9, 7, 4, 2, 6, 1, 3, [8, 1]]
+[2, 3, 8, 7, 1, 5, 9, 6, 4]
+```
+
+12)
+
+```
+[3, 7, 1, 5, 4, 2, 8, 9, 6]
+[9, 8, 5, 3, 6, 7, 4, 1, 2]
+[6, 4, 2, 8, 9, 1, 7, 5, 3]
+[8, 2, 6, 1, 5, 4, 3, 7, 9]
+[4, 1, 3, 2, 7, 9, 6, 8, 5]
+[7, 5, 9, 6, 3, 8, 2, 4, 1]
+[1, 6, 4, 9, 8, 3, 5, 2, 7]
+[5, 9, 7, 4, 2, 6, 1, 3, 8]
+[2, 3, 8, 7, 1, 5, 9, 6, 4]
+
+ [SEQUENTIAL] Solved sudokus: 1 out of 1
+Tot of correct over all: 1 / 1
+Accuracy is: 100.00 %
+Elapsed: 0.00016804933547973633 min
 ```
 
 
@@ -247,7 +330,7 @@ Strangely putting a low number of loops for the propagation enhanced the perform
 ## 9 Bibliography
 
 - [1] Berggren, “A study of Sudoku solving algorithms.”
-
 - [2] Simonis, “Sudoku as a Constraint Problem.”
 - [3] https://medium.com/@machine.learning.language/anti-plagiarism-python-e5f259eb3f46
 - [4] https://medium.com/@machine.learning.language/pygraham-functional-methods-in-python-d5921208416a
+- [5] slides of the professor, part of "Local Search", slide number 34 of 61

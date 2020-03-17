@@ -15,7 +15,7 @@ from scraper import download_sudokus, load_qqwing_sudokus
 from util import solve, Sudodata, parse_sudoku, print_distributed_results
 from antiplagiarism import antiplagiarism
 
-DISTRIBUTE = True
+DISTRIBUTE = False
 VIEW_RESULTS = False
 DOWNLOAD_DATA = False
 
@@ -34,7 +34,7 @@ if DOWNLOAD_DATA:
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x).filter(lambda x: "sudoku1.txt" in x)
 	num_sudoku_avail = len(dataset)
 	c = Redis(host='192.168.1.237')
 	q = Queue(connection=c)
@@ -51,6 +51,7 @@ def main():
 					count += 1
 					print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
 				else:
+					#print(Sudodata(curr_sudoku))
 					result = solve(Sudodata(curr_sudoku))
 
 					if result != -1:

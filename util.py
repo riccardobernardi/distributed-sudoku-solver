@@ -9,10 +9,13 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 4
+PROPAGATION_TRIES = 20
+WRONG = "wrong"
+CORRECT = "correct"
+CONTINUE = "continue"
 
 
-def print_distributed_results(jobs,num_sudoku_avail):
+def print_distributed_results(jobs, num_sudoku_avail):
 	solved = 0
 	print()
 	distributed_finished = 0
@@ -205,21 +208,23 @@ class Sudodata():
 		for i in range(RANK * RANK):
 			for j in range(RANK * RANK):
 				if type(self.cell_rc(i, j)) != int:
-					return False
+					if len(self.cell_rc(i, j)) == 0:
+						return WRONG
+					return CONTINUE
 
 		for i in self.row_iter():
 			if len(set([i for i in range(1, 10)]) & set(i)) != 9:
-				return False
+				return WRONG
 
 		for i in self.col_iter():
 			if len(set([i for i in range(1, 10)]) & set(i)) != 9:
-				return False
+				return WRONG
 
 		for i in self.box_iter():
 			if len(set([i for i in range(1, 10)]) & set(i)) != 9:
-				return False
+				return WRONG
 
-		return True
+		return CORRECT
 
 	def void_elems(self):
 		for i in self.row_iter():
@@ -384,40 +389,37 @@ def get_least_constrained_choice(possibles):
 
 
 def solve(data):
-	#check the recursion if data is solved or discardable
-	if data.is_solved():
-		return data
-	if data.duplicates() or data.void_elems():
-		return -1
-
-	for _ in range(PROPAGATION_TRIES):
+	for i in range(PROPAGATION_TRIES):
+		tmp = copy.deepcopy(data)
 		data = propagate_constraints(data)
+		if data == tmp:
+			break
 
 	# check if propagation solved the matrix or the matrix is discardable
-	if data.is_solved():
+	check = data.is_solved()
+	if check == CORRECT:
 		return data
-	if data.duplicates() or data.void_elems():
+	if check == WRONG:
 		return -1
 
-	if not data.is_solved():
-		possibles = data.get_possibles()
+	possibles = data.get_possibles()
 
-		# if no possibilities and not solved discard the recursion
-		if len(possibles) == 0:
-			return -1
+	# if no possibilities and not solved discard the recursion
+	if len(possibles) == 0:
+		return -1
 
-		if MOST_CONSTRAINED:
-			x, y, choices = get_most_constrained_choice(possibles)
-		else:
-			x, y, choices = get_least_constrained_choice(possibles)
+	if MOST_CONSTRAINED:
+		x, y, choices = get_most_constrained_choice(possibles)
+	else:
+		x, y, choices = get_least_constrained_choice(possibles)
 
-		for k in choices:
-			to_pass = copy.deepcopy(data)
-			to_pass.assign_cell_rc(x, y, k)
+	for k in choices:
+		to_pass = copy.deepcopy(data)
+		to_pass.assign_cell_rc(x, y, k)
 
-			result = solve(to_pass)
+		result = solve(to_pass)
 
-			if result != -1:
-				return result
+		if result != -1:
+			return result
 
 	return -1

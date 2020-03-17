@@ -8,8 +8,6 @@ E-mail: 864018@stud.unive.it
 
 The code and the report were entirely developed only by Riccardo Bernardi.
 
-The author is a passionate sudoku solver and a passionate python programmer so you will find additions with respect to the basic assignment's requests. 
-
 The author developed a library to program in a more functional way in python called pygraham so it is possible to find "list(...).map(...).reduce(...)". This construct is correct and it is introduced thanks to pygraham library, freely available on PyPI. It is present in the bibliography[4] an article that explains it.
 
 Some libraries that were used in the assignment are previous projects of the author published on PyPI, in these cases will be put references.
@@ -214,6 +212,9 @@ def solve(data):
 | 1899sudokus | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20   | 0.38secs           | 100%     |
 | 1899sudokus | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8    | 0.38secs           | 100%     |
 | 1899sudokus | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 5    | 0.20secs           | 100%     |
+| 1899sudokus | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 4    | 0.22secs           | 100%     |
+| 1899sudokus | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 3    | 0.21secs           | 100%     |
+| 1899sudokus | 5.65mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | PROPAGATION_TRIES = 5    | 0.18secs           | 100%     |
 
 
 

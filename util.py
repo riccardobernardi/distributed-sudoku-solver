@@ -9,7 +9,7 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 12
+PROPAGATION_TRIES = 4
 
 
 def print_distributed_results(jobs,num_sudoku_avail):

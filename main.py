@@ -12,8 +12,7 @@ pickle.HIGHEST_PROTOCOL = 2
 from rq import Queue
 import time
 from scraper import download_sudokus, load_qqwing_sudokus
-from util import solve, squeze_all, RANK, split, to_int, Sudodata, parse_sudoku, print_distributed_results
-from time import sleep
+from util import solve, Sudodata, parse_sudoku, print_distributed_results
 from antiplagiarism import antiplagiarism
 
 DISTRIBUTE = False

@@ -210,6 +210,10 @@ def solve(data):
 | 1899sudokus | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED | 0.0026secs         | 100%     |
 | 1899sudokus | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR             | a lot              | n.a.     |
 | 1899sudokus | 8.50mins     | [ADD-4] equality of sudoku is performed using a custom hashing, not so efficient | HASH-COMPARISON          | 0.26secs           | 100%     |
+| 1899sudokus | 12mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 12   | 0.38secs           | 100%     |
+| 1899sudokus | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20   | 0.38secs           | 100%     |
+| 1899sudokus | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8    | 0.38secs           | 100%     |
+| 1899sudokus | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 5    | 0.20secs           | 100%     |
 
 
 

@@ -1,8 +1,6 @@
 import pickle
 from time import sleep, time
 
-import numpy as np
-
 pickle.HIGHEST_PROTOCOL = 2
 
 import copy
@@ -54,7 +52,8 @@ def print_distributed_results(jobs, num_sudoku_avail,init):
 			if i.is_finished and (i.get_id() not in excluded):
 				excluded.add(i.get_id())
 				distributed_finished += 1
-			print("\r [SEQUENTIAL] Solved sudokus:", solved, "out of", num_sudoku_avail, "[Elapsed:",(time.time() - init) / 60, "mins]", "[Projection:",num_sudoku_avail / solved * ((time.time() - init) / 60), "mins]", "[Avg:",(time.time() - init) / solved, "secs]", end='')
+			if distributed_finished != 0:
+				print("\r [DISTRIBUTED] Finished sudokus:", distributed_finished, "out of", num_sudoku_avail, "[Elapsed:",(time() - init) / 60, "mins]", "[Projection:",num_sudoku_avail / distributed_finished * ((time() - init) / 60), "mins]", "[Avg:",(time() - init) / distributed_finished, "secs]", end='')
 
 		sleep(0.01)
 

@@ -152,6 +152,8 @@ def duplicates(self){...}
 def hash(self){...}
 ```
 
+The is_solved method is very important because based on the status of the sudoku returns one of the states in this tuple: ("CORRECT","WRONG","CONTINUE"). If the sudoku is completed then the "CORRECT" is returned, if there are duplicates or a cell have no number but also no available solutions(there is an empty list) then the "WRONG" word is returned and this means that you are in the wrong branch of the recursion that have to be dropped. If instead the sudoku is not solved but you are on the good way(no duplicates and no empty lists) then a "CONTINUE" is returned.
+
 To speed-up the computation of the most expensive operations(box operations in general) I precomputed the values and here is the signature of the function:
 
 ```python
@@ -273,11 +275,13 @@ def get_most_constrained_choice(possibles){...}
 def get_least_constrained_choice(possibles){...}
 ```
 
-The possibles are calculated by the method of Sudodata called get_possibles that localizes only the values that instead of being an integer are vectors and based on the strategy chosen 
+The "possibles" are calculated by the method of Sudodata class called get_possibles that localizes only the values that instead of being an integer are vectors and based on the strategy chosen before will output only the best choice fitting the strategy.
 
 ```python
 def get_possibles(self)
 ```
+
+Obviously if "possibles==0" is True then no solution is available but since the sudoku is not solved(because few lines before this fact is checked) then you are in a wrong branch of the recursion so the only thing to do is dropping that branch with a "return -1".
 
 The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. We take also a snapshot of the Sudodata object in that moment because if at the end no modification has occured then the propagation was useless so the backtracking is needed.
 

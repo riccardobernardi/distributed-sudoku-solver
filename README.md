@@ -49,7 +49,7 @@ The easiest puzzles will be solved by just doing the steps before but for the ha
 
 This part is not requested but was really important to check the performances of the algorithm and to improve them. I mean that training my algorithm on a thousand of images is very different between training it on a batch of ten. The webscraper works connecting to some predetermined pages that is known contain links to ".txt" files with puzzles or also directly one page that contains many puzzles. Obviously this means that the webscraper is able to accept different formats of data and encode it correctly.
 
-The code below connects to the sites with the most difficult sudoku that i was able to find:
+The code below connects to the sites with the most difficult sudokus that i was able to find:
 
 ```python
 def download_sudokus(){...}
@@ -81,6 +81,10 @@ The test said that ~150 sudokus were very similar, so at least 90% of similarity
 
 The downloading of the data can be activated or deactivated using: "DOWNLOAD_DATA = False".
 
+All the data above can be activated by putting "WEBSCRAPED" constant equal to True.
+
+After some other searches I've found an immense repository of sudokus provided by the very famous Kaggle website, also this is available to be used in this project, it is activated by putting to True the constant "LOAD_KAGGLE". I noticed that this dataset performs many times better than the webscraped one because all the puzzles reside on a single ".csv" file so the cost of IO is low w.r.t. to the webscraped data that is segmented into many litlle files.
+
 Other function that are used are:
 
 ```python
@@ -93,16 +97,23 @@ def parse_sudoku(f){...}
 
 ## 3 Data Model
 
-From the very first time I thought that a proper data model can be very helpful so I modelled a class that was able to mainly give me rows, columns and boxes easily but also that provided the transformes to change values of the sudoku passing a callback/lambda. The peculiarity of this class is that I maintained the triplets of data by rows that simplifies the return of boxes.
+From the very first time I thought that a proper data model can be very helpful so I modelled a class that was able to mainly give me rows, columns and boxes easily but also that provided the transformes to change values of the sudoku passing a callback/lambda.
 
 It is important to clarify that I approached the problem substituting the 0's in the matrix passed by the user with a list [1...9] for every 0's. So propagating constraints for me is done via the elimination of the wrong choices in the list [1...9].
+
+The fields of the Sudodata are here below, they are only 2, the necessary ones. The. matrix is the raw matrix that was only parsed to be a correct matrix with 9 rows and 9 columns. The parsing is done because the sudokus are received from different sources in many different formats(eg: csv, txt, web, many sudokus in a txt, links to txts, etc). In case you are using the solution is provided and at the end there will be a further check about correctness of my solution, if no assertion is thrown then my solution is congruent to the one provided by Kaggle.
+
+```python
+def __init__(self, matrix, sol=-1):
+  self.data = matrix
+  self.sol = sol
+```
 
 Some basic methods, the method with no indication returns the value(it is a getter) instead if it is named "assign" then it is a setter.
 
 ```python
 def cell_rc(self, r, c){...}
 def assign_cell_rc(self, r, c, v){...}
-def cell_rtc(self, r, t, c){...}
 def column(self, c){...}
 def assign_column(self, c, v){...}
 def row(self, r){...}
@@ -139,6 +150,12 @@ def is_solved(self){...}
 def void_elems(self){...}
 def duplicates(self){...}
 def hash(self){...}
+```
+
+To speed-up the computation of the most expensive operations(box operations in general) I precomputed the values and here is the signature of the function:
+
+```python
+def precompute_box_indexes(){...}
 ```
 
 
@@ -249,7 +266,18 @@ Elapsed: 0.00016804933547973633 min
 
 ## 5 BackTracking
 
+Before doing backtracking you probably would like to choose your strategy, you can do this by setting the constant "MOST-CONSTRAINED" to True that is the default choice and the most recommended one or you can swap its value to obtain the least constrained strategy. The two strategies are implemented with two functions, here below the signature. Each one will take in the possible values that can be put into the sudoku to complete it in the form of a vector and will output "x, y, choices" that are the row, the column and a vector chosen with the preferred strategy(with most constrained the choices vector is as short as possible). The choices vector represents the branches that will have the recursion tree.
 
+```python
+def get_most_constrained_choice(possibles){...}
+def get_least_constrained_choice(possibles){...}
+```
+
+The possibles are calculated by the method of Sudodata called get_possibles that localizes only the values that instead of being an integer are vectors and based on the strategy chosen 
+
+```python
+def get_possibles(self)
+```
 
 The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. We take also a snapshot of the Sudodata object in that moment because if at the end no modification has occured then the propagation was useless so the backtracking is needed.
 

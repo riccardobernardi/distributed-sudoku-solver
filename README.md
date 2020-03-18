@@ -283,7 +283,9 @@ def get_possibles(self)
 
 Obviously if "possibles==0" is True then no solution is available but since the sudoku is not solved(because few lines before this fact is checked) then you are in a wrong branch of the recursion so the only thing to do is dropping that branch with a "return -1".
 
-The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. We take also a snapshot of the Sudodata object in that moment because if at the end no modification has occured then the propagation was useless so the backtracking is needed.
+The core of the backtracking is done via the function solve, it takes as input a matrix that is the sudoku board that was formatted by the parse_sudoku function. After that the matrix is transformed into a Sudodata. 
+
+The mechanism of this recursion is very easy, when the function is called it is checked if the sudoku is solved, this is useless if this is the first call of the function but it is useful because when the recursion is called then if the sudoku is wrong the branch is killed as fast as possible. If the sudoku is not solved and doesn't contain errors then you are going to propagate the constraints. This last passage is straight-forward because comes directly from the rules of the game, the only interesting bit that I add is that I obtained better results with lower values of PROPAGATION_TRIES(eg: from 3 to 7), so the number of propagations. This is because in few cases the puzzle is simple and it is solved with 12 moves but for all the other complex puzzles you are going to put 12loops inside many and many recursions. This is going to kill your perfomances. I mean that is worthless to gain some seconds on few easy puzzles instead that having a better resolution on heavier ones. After the propagation you are going to check which are the possible moves to be done in the recursion. If there are no possible moves you are in a recursion(or the puzzle is wrong) and you have to drop it. Then from all the possible moves you take the one whose fits best your chosen strategy(MOST or LEAST). I implemented both but it is important to say that the MOST is the strongly recommended one, this is because in the best/average case you are going to choose a cell in which the possibility is going to be X or Y, in this case you have a branching factor that is 2 but for every tree of recursion you are going to simplify at least another cell, why? Just because if you have one cell that have a cyclic behavior(not solvable with propagation because swaps with another cell the values) then you absolutely solve this behaviour of the other one blocking the first. So choosing the MOST strategy means that in a recursion you fill at least 2 cells instead this is not guaranteed with LEAST nor excpectable.
 
 ```python
 def solve(data):
@@ -322,7 +324,11 @@ def solve(data):
 
 ## 6 Distributed Computations 
 
-The pool of available sudokus are distributed over a finite set of raspberry pi that use the **solve** function shown above to compute the result
+The pool of available sudokus are distributed over a finite set of raspberry pi that use the **solve** function shown above to compute the result. The computation is started as here:
+
+```
+
+```
 
 
 
@@ -330,7 +336,7 @@ The pool of available sudokus are distributed over a finite set of raspberry pi 
 
 
 
-| Num. Sudoku  | Time in mins | Description of improvement                                   | Constants                                  | seconds per sudoku | Accuracy |
+| Num. Sudokus | Time in mins | Description of improvement                                   | Constants                                  | seconds per sudoku | Accuracy |
 | ------------ | ------------ | ------------------------------------------------------------ | ------------------------------------------ | ------------------ | -------- |
 | 1899sudokus  | 26mins       | This was the first try                                       | MOST_CONSTR                                | 0.89secs           | 100%     |
 | 1899sudokus  | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR                                | 0.38secs           | 100%     |

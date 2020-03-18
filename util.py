@@ -86,7 +86,7 @@ def parse_sudoku(f):
 		if (j[1] != " ") and (j[3] != " "):
 			curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
 
-	curr_sudoku = squeze_all(curr_sudoku)
+	curr_sudoku = squeeze_all(curr_sudoku)
 	return curr_sudoku
 
 
@@ -113,7 +113,7 @@ def show(matrix):
 		print()
 
 
-def squeze_all(matrix):
+def squeeze_all(matrix):
 	for i in range(len(matrix)):
 		if (type(matrix[i]) != int) and (len(matrix[i]) == 1):
 			matrix[i] = matrix[i][0]

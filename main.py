@@ -43,8 +43,9 @@ def main():
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
 		jobs = []
+		dataset = list(os.listdir("./sudoku_csvs/")).filter(lambda x: "reduced_sudokus_kaggle.csv" in x)
 
-		for i in os.listdir("./sudoku_csvs"):
+		for i in dataset:
 			print("loading sudokus from kaggle's csv:", i)
 			ds = pd.read_csv("./sudoku_csvs/"+i,nrows=nrows)
 			for i in ds.iterrows():

@@ -37,29 +37,42 @@ if DOWNLOAD_DATA:
 
 def main():
 	if LOAD_KAGGLE:
+		init = time.time()
 		count = 0
 		solved = 0
 		nrows = 3
+		c = Redis(host='192.168.1.237')
+		q = Queue(connection=c)
+		jobs = []
 		for i in os.listdir("./sudoku_csvs"):
 			print("loading sudokus from kaggle's csv:", i)
 			ds = pd.read_csv("./sudoku_csvs/"+i,nrows=nrows)
 			for i in ds.iterrows():
 				curr_sudoku = parse_sudoku(i[1]["quizzes"])
 				sol_sudoku = parse_sudoku(i[1]["solutions"])
-				result = solve(Sudodata(curr_sudoku,sol_sudoku))
 
-				if result != -1:
-					if VIEW_RESULTS:
-						print("--------------------------")
-						print(result)
-					solved += 1
-				count += 1
-				print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", nrows, "[Elapsed:",(time.time() - init) / 60, "mins]", "[Projection:",nrows / count * ((time.time() - init) / 60), "mins]", "[Avg:",(time.time() - init) / count, "secs]", end='')
+				if DISTRIBUTE:
+					jobs.append(q.enqueue(solve, Sudodata(curr_sudoku,sol_sudoku)))
+					count += 1
+					print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", nrows, end='')
+				else:
+					result = solve(Sudodata(curr_sudoku,sol_sudoku))
+
+					if result != -1:
+						if VIEW_RESULTS:
+							print("--------------------------")
+							print(result)
+						solved += 1
+					count += 1
+					print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", nrows, "[Elapsed:",(time.time() - init) / 60, "mins]", "[Projection:",nrows / count * ((time.time() - init) / 60), "mins]", "[Avg:",(time.time() - init) / count, "secs]", end='')
 
 		print()
 		print("Tot of correct over all:", solved, "/", nrows)
 		print("Accuracy is: %.2f" % ((solved / nrows) * 100), "%")
+		print("Elapsed:", (time.time() - init) / 60, "min")
+
 	if WEBSCRAPED:
+		init = time.time()
 		count = 0
 		solved = 0
 		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:3]  # or ("norvig" in x))
@@ -97,8 +110,6 @@ def main():
 		print()
 		print("Tot of correct over all:", solved, "/", num_sudoku_avail)
 		print("Accuracy is: %.2f" % ((solved / num_sudoku_avail) * 100), "%")
+		print("Elapsed:", (time.time() - init) / 60, "min")
 
-
-init = time.time()
 main()
-print("Elapsed:", (time.time() - init) / 60, "min")

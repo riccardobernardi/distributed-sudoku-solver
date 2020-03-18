@@ -1,9 +1,13 @@
 import os
 import urllib
+import pandas as pd
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import re
+
+from util import parse_sudoku, Sudodata, solve
+
 
 def make_soup(url):
 	html = urlopen(url).read()

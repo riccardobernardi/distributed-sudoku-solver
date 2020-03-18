@@ -4,3 +4,4 @@
 *.pyc
 /.DS_store
 sudokus/.DS_Store
+sudoku_csvs/sudoku.csv

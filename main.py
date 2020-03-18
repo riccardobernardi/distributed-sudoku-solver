@@ -1,6 +1,8 @@
 import os
 import pickle
 
+import pandas as pd
+
 pickle.HIGHEST_PROTOCOL = 2
 
 import rq
@@ -18,6 +20,8 @@ from antiplagiarism import antiplagiarism
 DISTRIBUTE = False
 VIEW_RESULTS = False
 DOWNLOAD_DATA = False
+LOAD_KAGGLE = True
+WEBSCRAPED = True
 
 
 if DOWNLOAD_DATA:
@@ -32,44 +36,67 @@ if DOWNLOAD_DATA:
 
 
 def main():
-	count = 0
-	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x : ".txt" in x)# or ("norvig" in x))
-	num_sudoku_avail = len(dataset)
-	c = Redis(host='192.168.1.237')
-	q = Queue(connection=c)
-	jobs = []
+	if LOAD_KAGGLE:
+		count = 0
+		solved = 0
+		nrows = 3
+		for i in os.listdir("./sudoku_csvs"):
+			print("loading sudokus from kaggle's csv:", i)
+			ds = pd.read_csv("./sudoku_csvs/"+i,nrows=nrows)
+			for i in ds.iterrows():
+				curr_sudoku = parse_sudoku(i[1]["quizzes"])
+				sol_sudoku = parse_sudoku(i[1]["solutions"])
+				result = solve(Sudodata(curr_sudoku,sol_sudoku))
 
-	for i in dataset:
-		# i is a txt file representing a sudoku in the correct format
-		try:
-			with open("./sudokus/" + i, mode="r") as f:
-				curr_sudoku = parse_sudoku(f)
+				if result != -1:
+					if VIEW_RESULTS:
+						print("--------------------------")
+						print(result)
+					solved += 1
+				count += 1
+				print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", nrows, "[Elapsed:",(time.time() - init) / 60, "mins]", "[Projection:",nrows / count * ((time.time() - init) / 60), "mins]", "[Avg:",(time.time() - init) / count, "secs]", end='')
 
-				if DISTRIBUTE:
-					jobs.append(q.enqueue(solve, Sudodata(curr_sudoku)))
-					count += 1
-					print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
-				else:
-					#print(Sudodata(curr_sudoku))
-					result = solve(Sudodata(curr_sudoku))
+		print()
+		print("Tot of correct over all:", solved, "/", nrows)
+		print("Accuracy is: %.2f" % ((solved / nrows) * 100), "%")
+	if WEBSCRAPED:
+		count = 0
+		solved = 0
+		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:3]  # or ("norvig" in x))
+		num_sudoku_avail = len(dataset)
+		c = Redis(host='192.168.1.237')
+		q = Queue(connection=c)
+		jobs = []
+		for i in dataset:
+			# i is a txt file representing a sudoku in the correct format
+			#try:
+				with open("./sudokus/" + i, mode="r") as f:
+					curr_sudoku = parse_sudoku(f)
 
-					if result != -1:
-						if VIEW_RESULTS:
-							print("--------------------------")
-							print(result)
-						solved += 1
-					count += 1
-					print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", num_sudoku_avail, "[Elapsed:", (time.time() - init) / 60, "mins]", "[Projection:", num_sudoku_avail/count*((time.time() - init) / 60), "mins]", "[Avg:", (time.time() - init)/count, "secs]", end='')
-		except:
-			print("A sudoku was wrongly formatted, in particular:", i)
+					if DISTRIBUTE:
+						jobs.append(q.enqueue(solve, Sudodata(curr_sudoku)))
+						count += 1
+						print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
+					else:
+						#print(Sudodata(curr_sudoku))
+						result = solve(Sudodata(curr_sudoku))
 
-	if DISTRIBUTE:
-		solved = print_distributed_results(jobs,num_sudoku_avail,init)
+						if result != -1:
+							if VIEW_RESULTS:
+								print("--------------------------")
+								print(result)
+							solved += 1
+						count += 1
+						print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", num_sudoku_avail, "[Elapsed:", (time.time() - init) / 60, "mins]", "[Projection:", num_sudoku_avail/count*((time.time() - init) / 60), "mins]", "[Avg:", (time.time() - init)/count, "secs]", end='')
+			# except:
+			# 	print("A sudoku was wrongly formatted, in particular:", i)
 
-	print()
-	print("Tot of correct over all:", solved, "/", num_sudoku_avail)
-	print("Accuracy is: %.2f" % ((solved / num_sudoku_avail) * 100), "%")
+		if DISTRIBUTE:
+			solved = print_distributed_results(jobs,num_sudoku_avail,init)
+
+		print()
+		print("Tot of correct over all:", solved, "/", num_sudoku_avail)
+		print("Accuracy is: %.2f" % ((solved / num_sudoku_avail) * 100), "%")
 
 
 init = time.time()

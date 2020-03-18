@@ -11,7 +11,7 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 12
+PROPAGATION_TRIES = 5
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
@@ -69,6 +69,10 @@ def print_distributed_results(jobs, num_sudoku_avail,init):
 def parse_sudoku(f):
 	curr_sudoku = list([])
 
+	# linear
+	if type(f) == str:
+		f = [f[(i-1)*9:(9*i)] for i in range(1,len(f)//8)]
+
 	for j in f:
 		if j == "\n":
 			continue
@@ -79,6 +83,7 @@ def parse_sudoku(f):
 
 		j = j.replace(" ", "")
 
+		# no spaces
 		if (j[1] != " ") and (j[3] != " "):
 			curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
 
@@ -125,8 +130,9 @@ def squeze_all(matrix):
 
 
 class Sudodata():
-	def __init__(self, matrix):
+	def __init__(self, matrix, sol=-1):
 		self.data = matrix
+		self.sol = sol
 
 	def cell_rc(self, r, c):
 		return self.data[r][c]
@@ -232,6 +238,8 @@ class Sudodata():
 			if len(set([j for j in range(1, 10)]) & set(i)) != 9:
 				return WRONG
 
+		if self.sol != -1:
+			assert self.sol == self.data
 		return CORRECT
 
 	def void_elems(self):

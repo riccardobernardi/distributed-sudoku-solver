@@ -166,7 +166,7 @@ def propagate_constraints(data):
 
 One important part is the squeezing operation. At a certain moment in a certain cell will remain only one value and so you want that such value trasforms from a vector of possible values into the actual value.
 
-An Example:
+Example:
 
 1)
 

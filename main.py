@@ -34,7 +34,7 @@ if DOWNLOAD_DATA:
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x).filter(lambda x: "sudoku1.txt" in x)
+	dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)
 	num_sudoku_avail = len(dataset)
 	c = Redis(host='192.168.1.237')
 	q = Queue(connection=c)
@@ -42,7 +42,7 @@ def main():
 
 	for i in dataset:
 		# i is a txt file representing a sudoku in the correct format
-		try:
+		#try:
 			with open("./sudokus/" + i, mode="r") as f:
 				curr_sudoku = parse_sudoku(f)
 
@@ -61,8 +61,8 @@ def main():
 						solved += 1
 					count += 1
 					print("\r [SEQUENTIAL] Solved sudokus:", count, "out of", num_sudoku_avail, end='')
-		except:
-			print("A sudoku was wrongly formatted, in particular:", i)
+		# except:
+		# 	print("A sudoku was wrongly formatted, in particular:", i)
 
 	if DISTRIBUTE:
 		solved = print_distributed_results(jobs,num_sudoku_avail)

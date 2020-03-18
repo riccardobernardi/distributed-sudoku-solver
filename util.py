@@ -9,10 +9,33 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 12
+PROPAGATION_TRIES = 3
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
+
+precomputed_box_indexes = [
+	[(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)],
+	[(0, 3), (0, 4), (0, 5), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5)],
+	[(0, 6), (0, 7), (0, 8), (1, 6), (1, 7), (1, 8), (2, 6), (2, 7), (2, 8)],
+	[(3, 0), (3, 1), (3, 2), (4, 0), (4, 1), (4, 2), (5, 0), (5, 1), (5, 2)],
+	[(3, 3), (3, 4), (3, 5), (4, 3), (4, 4), (4, 5), (5, 3), (5, 4), (5, 5)],
+	[(3, 6), (3, 7), (3, 8), (4, 6), (4, 7), (4, 8), (5, 6), (5, 7), (5, 8)],
+	[(6, 0), (6, 1), (6, 2), (7, 0), (7, 1), (7, 2), (8, 0), (8, 1), (8, 2)],
+	[(6, 3), (6, 4), (6, 5), (7, 3), (7, 4), (7, 5), (8, 3), (8, 4), (8, 5)],
+	[(6, 6), (6, 7), (6, 8), (7, 6), (7, 7), (7, 8), (8, 6), (8, 7), (8, 8)]
+]
+
+
+def box_indexes():
+	for v in range(RANK):
+		for i in range(RANK):
+			box = []
+			for j in range(RANK):
+				for k in range(RANK):
+					box += [(v * RANK + j, i * RANK + k)]
+
+			yield box
 
 
 def print_distributed_results(jobs, num_sudoku_avail):
@@ -50,25 +73,16 @@ def parse_sudoku(f):
 		# one space between each number
 		if j[1] == " ":
 			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
-			add = []
-			for i in range(RANK):
-				add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
-			curr_sudoku[-1] = add
 
 		# one space every 3
 		if (j[1] != " ") and (j[3] == " "):
-			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
+			curr_sudoku += [list(split(j.replace("\n", "").replace(" ",""))).map(to_int)]
 
 		# no space never
 		if (j[1] != " ") and (j[3] != " "):
 			curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
-			add = []
-			for i in range(RANK):
-				add += [curr_sudoku[-1][i * RANK:(i + 1) * RANK]]
-			curr_sudoku[-1] = add
 
 	curr_sudoku = squeze_all(curr_sudoku)
-
 	return curr_sudoku
 
 
@@ -115,30 +129,27 @@ class Sudodata():
 		self.data = matrix
 
 	def cell_rc(self, r, c):
-		return self.data[r][c // RANK][c % RANK]
+		return self.data[r][c]
 
 	def assign_cell_rc(self, r, c, v):
-		self.data[r][c // RANK][c % RANK] = v
+		self.data[r][c] = v
 
 	def cell_rtc(self, r, t, c):
-		return self.data[r][t][c]
+		return self.data[r][t]
 
 	def column(self, c):
-		return list([self.data[i][c // RANK][c % RANK] for i in range(RANK * RANK)])
+		return list([self.data[i][c] for i in range(RANK * RANK)])
 
 	def assign_column(self, c, v):
 		for i in range(RANK * RANK):
-			self.data[i][c // RANK][c % RANK] = v[i]
+			self.data[i][c]= v[i]
 
 	def row(self, r):
-		return list([self.data[r][i // RANK][i % RANK] for i in range(RANK * RANK)])
+		return list([self.data[r][i] for i in range(RANK * RANK)])
 
 	def assign_row(self, r, v):
 		for i in range(RANK * RANK):
-			self.data[r][i // RANK][i % RANK] = v[i]
-
-	def triplet(self, r, t):
-		return list(self.data[r][t])
+			self.data[r][i] = v[i]
 
 	def cell_iter(self):
 		for i in range(RANK * RANK):
@@ -154,13 +165,11 @@ class Sudodata():
 			yield self.column(i)
 
 	def box_iter(self):
-		for v in range(RANK):
-			for i in range(RANK):
-				box = []
-				for j in range(RANK):
-					for k in range(RANK):
-						box += [self.cell_rc(v * RANK + j, i * RANK + k)]
-				yield box
+		for box in precomputed_box_indexes:
+			temp_box = []
+			for cell in box:
+				temp_box += [self.cell_rc(cell[0],cell[1])]
+			yield temp_box
 
 	def cell_transformer(self, l):
 		for i in range(RANK * RANK):
@@ -176,14 +185,8 @@ class Sudodata():
 			self.assign_column(i, l(self.column(i)))
 
 	def box_transformer(self, l):
-		for v in range(RANK):
-			for i in range(RANK):
-				box = []
-				for j in range(RANK):
-					for k in range(RANK):
-						box += [(v * RANK + j, i * RANK + k)]
-
-				l(box)
+		for box in precomputed_box_indexes:
+			l(box)
 
 	def __iter__(self):
 		for i in range(RANK * RANK):

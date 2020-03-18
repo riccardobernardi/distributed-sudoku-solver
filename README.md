@@ -35,7 +35,7 @@ Some numbers at the start of the game are already provided on the sudoku and can
 
 Another important notice about sudokus is that a sudoku that is correct should have exactly one solution, this is very important because asserting this fact will allow us to search for a solution with the certainty of converging.
 
-Constraint Propagation is about taking the rule as written before and building a method that checks that fact but my implementation works in a different way, it prunes wrong solutions from possible ones. In particular at the very start every 0 cell(void cells to be calculated) are substituted by an array [1...9] and the **propagate_constraints** function will prune wrong ones.
+Constraint Propagation is about taking the rules as written before and building a method that checks that fact, pruning wrong solutions from possible ones. In particular at the very start every 0 cell(void cells to be calculated) are substituted by an array [1...9] and the **propagate_constraints** function will prune wrong ones recursively.
 
 In general we can implement the constrains propagation using the most-constrained strategy or the least one. It is known that the most-constrained strategy helps pruning the tree of recursion in the backtracking so it is the best choice[5].
 
@@ -324,17 +324,82 @@ def solve(data):
 
 ## 6 Distributed Computations 
 
-The pool of available sudokus are distributed over a finite set of raspberry pi that use the **solve** function shown above to compute the result. The computation is started as here:
+The pool of available sudokus are distributed over a finite set of raspberry pi that use the **solve** function shown above to compute the result. The computation is started by putting the constant "DISTRIBUTE" to True, by default it is False
 
+```python
+DISTRIBUTE = true
 ```
 
+The commands available are the ones here below, in the "hosts" variable are listed the hostnames of the slaves that you can access to make them working. All these commands work on the entire pool at the same time. The "upload" will put your files into the raspberries, be aware that if you import a library into your files then you need to also install them into the raspberries and this can be done via the function "setup". Shutdown halts all the slaves/hosts. Start will put all the slaves listening on the port and hostname of the laptop that hosts the redis server. The redis server is needed as a storage of the jobs that are managed via the software called "RQ".
+
+```python
+hosts = [
+    'Rpi1',
+    'Rpi2',
+    'Rpi3',
+    'Rpi4',
+]
+
+def shutdown(){...}
+def setup(){...}
+def upload(){...}
+def start(){...}
 ```
+
+In the way explained here the job is enqueued into on the queue "q" and the argument of the function solve is the Sudodata with the matrix of the sudoku and its solution.
+
+```python
+if DISTRIBUTE:
+   jobs.append(q.enqueue(solve, Sudodata(curr_sudoku,sol_sudoku)))
+```
+
+Here the code to check if a job is done and to retrieve its returning value from the RQ queue. The "job.return_value" will give you the resulting matrix computed on one of the N hosts.
+
+
+
+```python
+excluded = set()
+while any(not job.is_finished for job in jobs):
+   for i in jobs:
+      if i.is_finished and (i.get_id() not in excluded):
+         excluded.add(i.get_id())
+         distributed_finished += 1
+      if distributed_finished != 0:
+         print("\r [DISTRIBUTED] Finished sudokus:", distributed_finished, "out of", num_sudoku_avail, end='')
+
+   sleep(0.01)
+
+for jj in jobs:
+   result = jj.return_value
+   if (result != -1) and (result is not None) and (type(result) != str):
+      solved += 1
+```
+
+
 
 
 
 ## 7 Evaluation
 
 
+
+This is the best result:
+
+| Num. Sudokus | Time in mins | Description of improvement                                   | Constants                                  | seconds per sudoku | Accuracy |
+| ------------ | ------------ | ------------------------------------------------------------ | ------------------------------------------ | ------------------ | -------- |
+| 10000sudokus | 0.43mins     | polished the code, switched to Kaggle sudoku dataset, using pandas lowered IO ops time | DISTRIBUTED, KAGGLE, PROPAGATION_TRIES = 5 | 0.0026secs         | 100%     |
+
+I achieved it by doing:
+
+- The equality between two matrices is very costly in my case so i discarded that type of approach.
+- Strangely putting a low number of loops for the propagation enhanced the performance, I think that this is because most of the puzzles are difficult and a long loop is very heavy inside recursions. Optimal values are between 3 and 5.
+- using pandas
+- precomputing indexes of the boxes
+- cutting out checks inside the recursion, for example there is only one "data.is_solved", this was studied in a way that the tradeoff cost/gain was as maximum as achievable .
+
+
+
+This is the history of many of the attempts that I've tried to improve performances:
 
 | Num. Sudokus | Time in mins | Description of improvement                                   | Constants                                  | seconds per sudoku | Accuracy |
 | ------------ | ------------ | ------------------------------------------------------------ | ------------------------------------------ | ------------------ | -------- |
@@ -359,11 +424,7 @@ The pool of available sudokus are distributed over a finite set of raspberry pi 
 
 ## 8 Conclusions
 
-I think that in this case the knowledge of the domain was crucial and I was able to devise a good solution since first try because I'm passionate.
-
-The equality between two matrices is very costly in my case so i discarded that type of approach.
-
-Strangely putting a low number of loops for the propagation enhanced the performance, I think that this is because most of the puzzles are difficult and a long loop is very heavy inside recursions. Optimal values are between 3 and 5.
+The task was very interesting because it helped me putting a lot of knowledge into only one project, for example it was not mandatory but obviously was surely helpful to download many of the sudokus from the internet so I solved creating a webscraper, but also reading the data from the csvs with pandas. I also had the possibility of using 2 o my previous projects on a real environment. Finally I really enjoyed distributing all the jobs on the raspberrys.
 
 
 

@@ -34,7 +34,7 @@ if DOWNLOAD_DATA:
 def main():
 	count = 0
 	solved = 0
-	dataset = list(os.listdir("./sudokus")).filter(lambda x : ".txt" in x)#.filter(lambda x: ("lipas" in x))# or ("norvig" in x))
+	dataset = list(os.listdir("./sudokus")).filter(lambda x : ".txt" in x)# or ("norvig" in x))
 	num_sudoku_avail = len(dataset)
 	c = Redis(host='192.168.1.237')
 	q = Queue(connection=c)

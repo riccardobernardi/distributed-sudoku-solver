@@ -77,15 +77,8 @@ def parse_sudoku(f):
 		if j == " ":
 			continue
 
-		# one space between each number
-		if j[1] == " ":
-			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")[:-1]]]
+		j = j.replace(" ", "")
 
-		# one space every 3
-		if (j[1] != " ") and (j[3] == " "):
-			curr_sudoku += [list(split(j.replace("\n", "").replace(" ", ""))).map(to_int)]
-
-		# no space never ############ERROR HERE
 		if (j[1] != " ") and (j[3] != " "):
 			curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
 

@@ -1,5 +1,7 @@
 import pickle
-from time import sleep
+from time import sleep, time
+
+import numpy as np
 
 pickle.HIGHEST_PROTOCOL = 2
 
@@ -9,7 +11,7 @@ from pygraham import *
 RANK = 3
 MOST_CONSTRAINED = True
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 3
+PROPAGATION_TRIES = 12
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
@@ -27,7 +29,7 @@ precomputed_box_indexes = [
 ]
 
 
-def box_indexes():
+def aux_precompute_box_indexes():
 	for v in range(RANK):
 		for i in range(RANK):
 			box = []
@@ -38,7 +40,11 @@ def box_indexes():
 			yield box
 
 
-def print_distributed_results(jobs, num_sudoku_avail):
+def precompute_box_indexes():
+	return [i for i in aux_precompute_box_indexes()]
+
+
+def print_distributed_results(jobs, num_sudoku_avail,init):
 	solved = 0
 	print()
 	distributed_finished = 0
@@ -48,7 +54,8 @@ def print_distributed_results(jobs, num_sudoku_avail):
 			if i.is_finished and (i.get_id() not in excluded):
 				excluded.add(i.get_id())
 				distributed_finished += 1
-			print("\r [DISTRIBUTED] Solved sudokus: ", distributed_finished, "out of", num_sudoku_avail, end='')
+			print("\r [SEQUENTIAL] Solved sudokus:", solved, "out of", num_sudoku_avail, "[Elapsed:",(time.time() - init) / 60, "mins]", "[Projection:",num_sudoku_avail / solved * ((time.time() - init) / 60), "mins]", "[Avg:",(time.time() - init) / solved, "secs]", end='')
+
 		sleep(0.01)
 
 	for jj in jobs:
@@ -72,13 +79,13 @@ def parse_sudoku(f):
 
 		# one space between each number
 		if j[1] == " ":
-			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")]]
+			curr_sudoku += [[list(split(i)).map(to_int) for i in k] for k in [j.replace("\n", "").split(" ")[:-1]]]
 
 		# one space every 3
 		if (j[1] != " ") and (j[3] == " "):
-			curr_sudoku += [list(split(j.replace("\n", "").replace(" ",""))).map(to_int)]
+			curr_sudoku += [list(split(j.replace("\n", "").replace(" ", ""))).map(to_int)]
 
-		# no space never
+		# no space never ############ERROR HERE
 		if (j[1] != " ") and (j[3] != " "):
 			curr_sudoku += [[list(split(k)).map(to_int) for k in [j.replace("\n", "")]][0]]
 
@@ -138,14 +145,14 @@ class Sudodata():
 		return self.data[r][t]
 
 	def column(self, c):
-		return list([self.data[i][c] for i in range(RANK * RANK)])
+		return [self.cell_rc(i, c) for i in range(RANK * RANK)]
 
 	def assign_column(self, c, v):
 		for i in range(RANK * RANK):
-			self.data[i][c]= v[i]
+			self.data[i][c] = v[i]
 
 	def row(self, r):
-		return list([self.data[r][i] for i in range(RANK * RANK)])
+		return self.data[r]
 
 	def assign_row(self, r, v):
 		for i in range(RANK * RANK):
@@ -168,7 +175,7 @@ class Sudodata():
 		for box in precomputed_box_indexes:
 			temp_box = []
 			for cell in box:
-				temp_box += [self.cell_rc(cell[0],cell[1])]
+				temp_box += [self.cell_rc(cell[0], cell[1])]
 			yield temp_box
 
 	def cell_transformer(self, l):
@@ -208,23 +215,28 @@ class Sudodata():
 			return True
 
 	def is_solved(self):
-		for i in range(RANK * RANK):
+		for i in range(RANK*RANK):
 			for j in range(RANK * RANK):
-				if type(self.cell_rc(i, j)) != int:
-					if len(self.cell_rc(i, j)) == 0:
+				if type(self.cell_rc(i,j)) != int:
+					if len(self.cell_rc(i,j)) == 0:
 						return WRONG
-					return CONTINUE
+
+		for i in range(RANK*RANK):
+			for j in range(RANK * RANK):
+				if type(self.cell_rc(i,j)) != int:
+					if len(self.cell_rc(i,j)) > 0:
+						return CONTINUE
 
 		for i in self.row_iter():
-			if len(set([i for i in range(1, 10)]) & set(i)) != 9:
+			if len(set([j for j in range(1, 10)]) & set(i)) != 9:
 				return WRONG
 
 		for i in self.col_iter():
-			if len(set([i for i in range(1, 10)]) & set(i)) != 9:
+			if len(set([j for j in range(1, 10)]) & set(i)) != 9:
 				return WRONG
 
 		for i in self.box_iter():
-			if len(set([i for i in range(1, 10)]) & set(i)) != 9:
+			if len(set([j for j in range(1, 10)]) & set(i)) != 9:
 				return WRONG
 
 		return CORRECT
@@ -366,7 +378,6 @@ def propagate_constraints(data):
 
 	data.row_transformer(squeeze)
 
-	#print(data)
 	return data
 
 

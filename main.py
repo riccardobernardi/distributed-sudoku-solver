@@ -39,7 +39,7 @@ def main():
 		init = time.time()
 		count = 0
 		solved = 0
-		nrows = 1000
+		nrows = 10000
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
 		jobs = []

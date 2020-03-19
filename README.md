@@ -401,24 +401,25 @@ I achieved it by doing:
 
 This is the history of many of the attempts that I've tried to improve performances:
 
-| Num. Sudokus | Time in mins | Description of improvement                                   | Constants                                  | seconds per sudoku | Accuracy |
-| ------------ | ------------ | ------------------------------------------------------------ | ------------------------------------------ | ------------------ | -------- |
-| 1899sudokus  | 26mins       | This was the first try                                       | MOST_CONSTR                                | 0.89secs           | 100%     |
-| 1899sudokus  | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR                                | 0.38secs           | 100%     |
-| 1899sudokus  | 7.9mins      | [ADD-2] pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR                                | 0.25secs           | 100%     |
-| 1899sudokus  | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED                   | 0.16secs           | 100%     |
-| 1899sudokus  | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR                               | a lot              | n.a.     |
-| 1899sudokus  | 8.50mins     | [ADD-4] equality of sudoku is performed using a custom hashing, not so efficient | HASH-COMPARISON                            | 0.26secs           | 100%     |
-| 1899sudokus  | 12mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 12                     | 0.38secs           | 100%     |
-| 1899sudokus  | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20                     | 0.38secs           | 100%     |
-| 1899sudokus  | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8                      | 0.38secs           | 100%     |
-| 1899sudokus  | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 5                      | 0.20secs           | 100%     |
-| 1899sudokus  | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 4                      | 0.22secs           | 100%     |
-| 1899sudokus  | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 3                      | 0.21secs           | 100%     |
-| 1899sudokus  | 5.65mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | PROPAGATION_TRIES = 5                      | 0.18secs           | 100%     |
-| 1899sudokus  | 3.86mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | DISTRIBUTED, PROPAGATION_TRIES = 5         | 0.12secs           | 100%     |
-| 10000sudokus | 0.56mins     | polished the code, switched to Kaggle sudoku dataset, using pandas lowered IO ops time | DISTRIBUTED, KAGGLE, PROPAGATION_TRIES = 5 | 0.003secs          | 100%     |
-| 10000sudokus | 0.43mins     | polished the code, switched to Kaggle sudoku dataset, using pandas lowered IO ops time | DISTRIBUTED, KAGGLE, PROPAGATION_TRIES = 5 | 0.0026secs         | 100%     |
+| Num. Sudokus | Time in mins | Description of improvement                                   | Constants                                        | seconds per sudoku | Accuracy |
+| ------------ | ------------ | ------------------------------------------------------------ | ------------------------------------------------ | ------------------ | -------- |
+| 1899sudokus  | 26mins       | This was the first try                                       | MOST_CONSTR                                      | 0.89secs           | 100%     |
+| 1899sudokus  | 12mins       | [ADD-1] pruning tree, adding more returns if data.void or data.duplicates | MOST_CONSTR                                      | 0.38secs           | 100%     |
+| 1899sudokus  | 7.9mins      | [ADD-2] pruning tree, adding more propagation just before the recursion begins | MOST_CONSTR                                      | 0.25secs           | 100%     |
+| 1899sudokus  | 5mins        | [ADD-3] distributing on the raspberry pi cluster             | MOST_CONSTR, DISTRIBUTED                         | 0.16secs           | 100%     |
+| 1899sudokus  | a lot        | This is done for completeness of the assignment but the time is awful | LEAST_CONSTR                                     | a lot              | n.a.     |
+| 1899sudokus  | 8.50mins     | [ADD-4] equality of sudoku is performed using a custom hashing, not so efficient | HASH-COMPARISON                                  | 0.26secs           | 100%     |
+| 1899sudokus  | 12mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 12                           | 0.38secs           | 100%     |
+| 1899sudokus  | 17mins       | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 20                           | 0.38secs           | 100%     |
+| 1899sudokus  | 8.1mins      | [MOD-5] polished and simplified the code to be more readable, performances are worst | PROPAGATION_TRIES = 8                            | 0.38secs           | 100%     |
+| 1899sudokus  | 6.58mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 5                            | 0.20secs           | 100%     |
+| 1899sudokus  | 6.92mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 4                            | 0.22secs           | 100%     |
+| 1899sudokus  | 6.79mins     | [MOD-5] polished and simplified the code to be more readable, performances improved | PROPAGATION_TRIES = 3                            | 0.21secs           | 100%     |
+| 1899sudokus  | 5.65mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | PROPAGATION_TRIES = 5                            | 0.18secs           | 100%     |
+| 1899sudokus  | 3.86mins     | [MOD-5] polished and simplified the code to be more readable, deleted one check | DISTRIBUTED, PROPAGATION_TRIES = 5               | 0.12secs           | 100%     |
+| 10000sudokus | 0.56mins     | polished the code, switched to Kaggle sudoku dataset, using pandas lowered IO ops time | DISTRIBUTED, KAGGLE, PROPAGATION_TRIES = 5       | 0.003secs          | 100%     |
+| 10000sudokus | 0.43mins     | polished the code, switched to Kaggle sudoku dataset, using pandas lowered IO ops time | KAGGLE, PROPAGATION_TRIES = 5                    | 0.0026secs         | 100%     |
+| 10000sudokus | 0.46mins     | polished the code, switched to Kaggle sudoku dataset, using pandas lowered IO ops time | KAGGLE, LEAST_CONSTRAINED, PROPAGATION_TRIES = 5 | 0.00276            | 100%     |
 
 
 

@@ -496,8 +496,6 @@ All the tests here below achieved 100% accuracy on every test.
 
 In conclusion I can say that was very interesting and I think that probably the program can be faster distributing it using the python multiprocessing library natively. I didn't do that because actually it is already possible by putting the machine that is the master in the queue of the slaves. This is because the slaves natively works in multiprocessing. Other improvements are available such as using genetic algorithms and applying them can be very interesting.
 
-The task was very interesting because it helped me putting a lot of knowledge into only one project, for example it was not mandatory but obviously was surely helpful to download many of the sudokus from the internet so I solved creating a webscraper, but also reading the data from the CSVs with pandas. I also had the possibility of using 2 o my previous projects on a real environment. Finally I really enjoyed distributing all the jobs on the raspberrys.
-
 
 
 ## 9 Bibliography

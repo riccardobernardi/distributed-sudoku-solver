@@ -7,7 +7,9 @@ import copy
 from pygraham import *
 
 RANK = 3
-MOST_CONSTRAINED = True
+#STRATEGY = "MOST"
+#STRATEGY = "LEAST"
+STRATEGY = "DEFAULT"
 HASH_COMPARISON = False
 PROPAGATION_TRIES = 5
 WRONG = "wrong"
@@ -474,6 +476,10 @@ def get_least_constrained_choice(possibles):
 	return max_value
 
 
+def get_default_ordering_choice(possibles):
+	return possibles[0]
+
+
 def solve(data):
 	for i in range(PROPAGATION_TRIES):
 		data = propagate_constraints(data)
@@ -491,9 +497,10 @@ def solve(data):
 	if len(possibles) == 0:
 		return -1
 
-	if MOST_CONSTRAINED:
+	x, y, choices = get_default_ordering_choice(possibles)
+	if STRATEGY == "MOST":
 		x, y, choices = get_most_constrained_choice(possibles)
-	else:
+	if STRATEGY == "LEAST":
 		x, y, choices = get_least_constrained_choice(possibles)
 
 	for k in choices:

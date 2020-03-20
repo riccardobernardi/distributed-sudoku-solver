@@ -20,7 +20,7 @@ from antiplagiarism import antiplagiarism
 DISTRIBUTE = False
 VIEW_RESULTS = False
 DOWNLOAD_DATA = False
-LOAD_KAGGLE = True
+LOAD_KAGGLE = False
 WEBSCRAPED = True
 
 
@@ -40,7 +40,8 @@ def main():
 		init = time.time()
 		count = 0
 		solved = 0
-		nrows = 500000
+		nrows = 200000 + 10000
+		skip = 200000
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
 		jobs = []
@@ -49,7 +50,10 @@ def main():
 		for i in dataset:
 			print("loading sudokus from kaggle's csv:", i)
 			ds = pd.read_csv("./sudoku_csvs/"+i,nrows=nrows)
-			for j in ds.iterrows():
+			nrows = nrows - skip
+			for en, j in enumerate(ds.iterrows()):
+				if en < skip:
+					continue
 				curr_sudoku = parse_sudoku(j[1]["quizzes"])
 				sol_sudoku = parse_sudoku_sol(j[1]["solutions"])
 
@@ -85,7 +89,7 @@ def main():
 		init = time.time()
 		count = 0
 		solved = 0
-		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x) # or ("norvig" in x))
+		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:30] # or ("norvig" in x))
 		num_sudoku_avail = len(dataset)
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)

@@ -450,3 +450,4 @@ The task was very interesting because it helped me putting a lot of knowledge in
 - [10] https://www.kaggle.com/bryanpark/sudoku
 - [11] https://www.kaggle.com/rohanrao/sudoku
 - [12] https://www.w3resource.com/numpy/manipulation/squeeze.php
+- [13] https://docs.python.org/3/library/re.html

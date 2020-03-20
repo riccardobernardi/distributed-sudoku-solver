@@ -14,14 +14,14 @@ pickle.HIGHEST_PROTOCOL = 2
 from rq import Queue
 import time
 from scraper import download_sudokus, load_qqwing_sudokus
-from util import solve, Sudodata, parse_sudoku, print_distributed_results
+from util import solve, Sudodata, parse_sudoku, print_distributed_results, cc
 from antiplagiarism import antiplagiarism
 
 DISTRIBUTE = False
 VIEW_RESULTS = False
 DOWNLOAD_DATA = False
 LOAD_KAGGLE = True
-WEBSCRAPED = False
+WEBSCRAPED = True
 
 
 def main():
@@ -36,14 +36,15 @@ def main():
 		print("number of sudokus that are very similar:", len(plagiarism), "(over 90% of similarity)")
 
 	if LOAD_KAGGLE:
+		cc.reset()
 		init = time.time()
 		count = 0
 		solved = 0
-		nrows = 10000
+		nrows = 100000
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
 		jobs = []
-		dataset = list(os.listdir("./sudoku_csvs/")).filter(lambda x: "reduced_sudokus_kaggle.csv" in x)
+		dataset = list(os.listdir("./sudoku_csvs/")).filter(lambda x: "sudoku.csv" in x)#.filter(lambda x: "reduced_sudokus_kaggle.csv" in x)
 
 		for i in dataset:
 			print("loading sudokus from kaggle's csv:", i)
@@ -74,13 +75,17 @@ def main():
 		print("Tot of correct over all:", solved, "/", nrows)
 		print("Accuracy is: %.2f" % ((solved / nrows) * 100), "%")
 		print("Elapsed:", (time.time() - init) / 60, "min")
+		print("recursion count", cc.get_num_recursive_calls(), ", mean of recursions per sudoku:", cc.get_num_recursive_calls()/nrows)
+		print("constraint prop count", cc.get_num_constraints_prop_calls(), ", mean of constr. prop. per sudoku:", cc.get_num_constraints_prop_calls()/nrows)
+		print("Coefficient of mean difficulty is:", cc.get_num_occupied_cells()/nrows,"(higher means easier sudokus)")
 		print("----------------------------------------------------------")
 
 	if WEBSCRAPED:
+		cc.reset()
 		init = time.time()
 		count = 0
 		solved = 0
-		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)  # or ("norvig" in x))
+		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x) # or ("norvig" in x))
 		num_sudoku_avail = len(dataset)
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
@@ -96,7 +101,6 @@ def main():
 						count += 1
 						print("\r [DISTRIBUTED] Distributed sudokus: ", count, "out of", num_sudoku_avail, end='')
 					else:
-						#print(Sudodata(curr_sudoku))
 						result = solve(Sudodata(curr_sudoku))
 
 						if result != -1:
@@ -116,6 +120,11 @@ def main():
 		print("Tot of correct over all:", solved, "/", num_sudoku_avail)
 		print("Accuracy is: %.2f" % ((solved / num_sudoku_avail) * 100), "%")
 		print("Elapsed:", (time.time() - init) / 60, "min")
+		print("recursion count", cc.get_num_recursive_calls(), ", mean of recursions per sudoku:",
+			  cc.get_num_recursive_calls()/num_sudoku_avail)
+		print("constraint prop count", cc.get_num_constraints_prop_calls(), ", mean of constr. prop. per sudoku:",
+			  cc.get_num_constraints_prop_calls()/num_sudoku_avail)
+		print("Coefficient of mean difficulty is:", cc.get_num_occupied_cells()/num_sudoku_avail,"(higher means easier sudokus)")
 		print("----------------------------------------------------------")
 
 main()

@@ -14,6 +14,39 @@ WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"
 
+
+class StatisticsEval:
+	def __init__(self):
+		self.count_recursions = 0
+		self.count_constraints = 0
+		self.count_occupied_cells = 0
+
+	def occupied_cell_present(self):
+		self.count_occupied_cells += 1
+
+	def get_num_occupied_cells(self):
+		return self.count_occupied_cells
+
+	def constraints_prop_call(self):
+		self.count_constraints += 1
+
+	def get_num_constraints_prop_calls(self):
+		return self.count_constraints
+
+	def recursive_call(self):
+		self.count_recursions += 1
+
+	def get_num_recursive_calls(self):
+		return self.count_recursions
+
+	def reset(self):
+		self.count_recursions = 0
+		self.count_constraints = 0
+		self.count_occupied_cells = 0
+
+
+cc = StatisticsEval()
+
 precomputed_box_indexes = [
 	[(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)],
 	[(0, 3), (0, 4), (0, 5), (1, 3), (1, 4), (1, 5), (2, 3), (2, 4), (2, 5)],
@@ -42,7 +75,7 @@ def precompute_box_indexes():
 	return [i for i in aux_precompute_box_indexes()]
 
 
-def print_distributed_results(jobs, num_sudoku_avail,init):
+def print_distributed_results(jobs, num_sudoku_avail, init):
 	solved = 0
 	print()
 	distributed_finished = 0
@@ -53,7 +86,10 @@ def print_distributed_results(jobs, num_sudoku_avail,init):
 				excluded.add(i.get_id())
 				distributed_finished += 1
 			if distributed_finished != 0:
-				print("\r [DISTRIBUTED] Finished sudokus:", distributed_finished, "out of", num_sudoku_avail, "[Elapsed:",(time() - init) / 60, "mins]", "[Projection:",num_sudoku_avail / distributed_finished * ((time() - init) / 60), "mins]", "[Avg:",(time() - init) / distributed_finished, "secs]", end='')
+				print("\r [DISTRIBUTED] Finished sudokus:", distributed_finished, "out of", num_sudoku_avail,
+					  "[Elapsed:", (time() - init) / 60, "mins]", "[Projection:",
+					  num_sudoku_avail / distributed_finished * ((time() - init) / 60), "mins]", "[Avg:",
+					  (time() - init) / distributed_finished, "secs]", end='')
 
 		sleep(0.01)
 
@@ -70,7 +106,7 @@ def parse_sudoku(f):
 
 	# linear
 	if type(f) == str:
-		f = [f[(i-1)*9:(9*i)] for i in range(1,len(f)//8)]
+		f = [f[(i - 1) * 9:(9 * i)] for i in range(1, len(f) // 8)]
 
 	for j in f:
 		if j == "\n":
@@ -100,6 +136,7 @@ def to_int(x):
 	if x == '.':
 		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
 	else:
+		cc.occupied_cell_present()
 		return int(x)
 
 
@@ -213,16 +250,16 @@ class Sudodata():
 			return True
 
 	def is_solved(self):
-		for i in range(RANK*RANK):
+		for i in range(RANK * RANK):
 			for j in range(RANK * RANK):
-				if type(self.cell_rc(i,j)) != int:
-					if len(self.cell_rc(i,j)) == 0:
+				if type(self.cell_rc(i, j)) != int:
+					if len(self.cell_rc(i, j)) == 0:
 						return WRONG
 
-		for i in range(RANK*RANK):
+		for i in range(RANK * RANK):
 			for j in range(RANK * RANK):
-				if type(self.cell_rc(i,j)) != int:
-					if len(self.cell_rc(i,j)) > 0:
+				if type(self.cell_rc(i, j)) != int:
+					if len(self.cell_rc(i, j)) > 0:
 						return CONTINUE
 
 		for i in self.row_iter():
@@ -406,6 +443,7 @@ def get_least_constrained_choice(possibles):
 def solve(data):
 	for i in range(PROPAGATION_TRIES):
 		data = propagate_constraints(data)
+		cc.constraints_prop_call()
 
 	check = data.is_solved()
 	if check == CORRECT:
@@ -428,6 +466,7 @@ def solve(data):
 		to_pass = copy.deepcopy(data)
 		to_pass.assign_cell_rc(x, y, k)
 
+		cc.recursive_call()
 		result = solve(to_pass)
 
 		if result != -1:

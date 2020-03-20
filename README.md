@@ -164,6 +164,8 @@ def precompute_box_indexes(){...}
 
 ## 4 Constraint Propagation
 
+The constraint strategy that i use is both direct and indirect in the sense that at the same time I check that one number is present in each row, column and box in only one copy. This is not going to apply an higher cost because I use the implicit semantic of the sets in python. The modelling is about creating a set of a row/col/box for the vector [1...9] and one for the reference row/col/box and i check that their intersection length is equal to 9.
+
 All the job of constraints propagation is done through the function below taht takes the Sudodata and returns it modified. All the mechnism works creating proper callbacks that will do the simplifications on the data and then it is called into a proper transformer that will apply such modifications to the existent sudoku.
 
 ```python

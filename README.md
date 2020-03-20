@@ -441,23 +441,32 @@ All the tests are run with MOST_CONSTRAINED strategy
 
 
 
-| Num. Sudokus | Time in mins | Dataset    | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty | Strategy |
-| ------------ | ------------ | ---------- | ------------------ | -------------------- | --------------- | -------- |
-| 1899         | 8.39mins     | WEBSCRAPED | 174.148            | 875.742              | 25.737          | MOST     |
-| 100'000      | 8.25mins     | KAGGLE1M   | 0.41               | 7.05                 | 33.812          | MOST     |
-| 30           | 0.0733mins   | WEBSCRAPED | 105.67             | 533.34               | 25.8332         | MOST     |
-| 30           | 0.1834mins   | WEBSCRAPED | 248.867            | 1249.33              | 25.8332         | DEFAULT  |
-| 30           | too much     | WEBSCRAPED | -                  | -                    | 25.8332         | LEAST    |
-| 10           | 4.639mins    | WEBSCRAPED | 18249.1            | 91250.5              | 26.3            | LEAST    |
-| 30           | 0.15932mins  | KAGGLE1M   | 0.333              | 6.666                | 33.63           | MOST     |
-| 30           | 0.1573mins   | KAGGLE1M   | 0.333              | 6.666                | 33.63           | DEFAULT  |
-| 30           | 0.1721mins   | KAGGLE1M   | 0.333              | 6.666                | 33.63           | LEAST    |
-| 1000         | 0.1937mins   | KAGGLE1M   | 0.388              | 6.94                 | 33.753          | MOST     |
-| 1000         | 0.1950mins   | KAGGLE1M   | 0.414              | 7.07                 | 33.753          | LEAST    |
-| 1000         | 0.1932mins   | KAGGLE1M   | 0.39               | 6.95                 | 33.753          | DEFAULT  |
-| 10000        | 0.3709mins   | KAGGLE1M   | 0.4013             | 7.0065               | 33.8165         | MOST     |
-| 10000        | 0.3796mins   | KAGGLE1M   | 0.4263             | 7.1315               | 33.8165         | LEAST    |
-| 10000        | 0.3758mins   | KAGGLE1M   | 0.4062             | 7.031                | 33.8165         | DEFAULT  |
+| Num. Sudokus | Dataset    | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty | Strategy | Prop. Tries |
+| ------------ | ---------- | ------------------ | -------------------- | --------------- | -------- | ----------- |
+| 1899         | WEBSCRAPED | 174.148            | 875.742              | 25.737          | MOST     | 5           |
+| 100'000      | KAGGLE1M   | 0.41               | 7.05                 | 33.812          | MOST     | 5           |
+| 30           | WEBSCRAPED | 105.67             | 533.34               | 25.8332         | MOST     | 5           |
+| 30           | WEBSCRAPED | 248.867            | 1249.33              | 25.8332         | DEFAULT  | 5           |
+| 30           | WEBSCRAPED | -                  | -                    | 25.8332         | LEAST    | 5           |
+| 10           | WEBSCRAPED | 18249.1            | 91250.5              | 26.3            | LEAST    | 5           |
+| 30           | KAGGLE1M   | 0.333              | 6.666                | 33.63           | MOST     | 5           |
+| 30           | KAGGLE1M   | 0.333              | 6.666                | 33.63           | DEFAULT  | 5           |
+| 30           | KAGGLE1M   | 0.333              | 6.666                | 33.63           | LEAST    | 5           |
+| 1000         | KAGGLE1M   | 0.388              | 6.94                 | 33.753          | MOST     | 5           |
+| 1000         | KAGGLE1M   | 0.414              | 7.07                 | 33.753          | LEAST    | 5           |
+| 1000         | KAGGLE1M   | 0.39               | 6.95                 | 33.753          | DEFAULT  | 5           |
+| 10000        | KAGGLE1M   | 0.4013             | 7.0065               | 33.8165         | MOST     | 5           |
+| 10000        | KAGGLE1M   | 0.4263             | 7.1315               | 33.8165         | LEAST    | 5           |
+| 10000        | KAGGLE1M   | 0.4062             | 7.031                | 33.8165         | DEFAULT  | 5           |
+| 100000       | KAGGLE1M   | 0.41041            | 7.05205              | 33.81248        | MOST     | 5           |
+| 100000       | KAGGLE1M   | 0.43952            | 7.1976               | 33.81248        | LEAST    | 5           |
+| 100000       | KAGGLE1M   | 0.4144             | 7.072                | 33.81248        | DEFAULT  | 5           |
+| 100000       | KAGGLE1M   | 0.00927            | 8.07416              | 33.81248        | MOST     | 8           |
+| 100000       | KAGGLE1M   | 0.01215            | 8.0972               | 33.81248        | LEAST    | 8           |
+| 100000       | KAGGLE1M   | 0.00964            | 8.07712              | 33.81248        | DEFAULT  | 8           |
+| 100000       | KAGGLE1M   | 0.00122            | 11.01342             | 33.81248        | MOST     | 11          |
+| 100000       | KAGGLE1M   |                    |                      |                 | LEAST    | 11          |
+| 100000       | KAGGLE1M   |                    |                      |                 | DEFAULT  | 11          |
 
 
 

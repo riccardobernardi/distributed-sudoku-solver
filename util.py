@@ -7,11 +7,11 @@ import copy
 from pygraham import *
 
 RANK = 3
-STRATEGY = "MOST"
-# STRATEGY = "LEAST"
+# STRATEGY = "MOST"
+STRATEGY = "LEAST"
 # STRATEGY = "DEFAULT"
 HASH_COMPARISON = False
-PROPAGATION_TRIES = 5
+PROPAGATION_TRIES = 11
 WRONG = "wrong"
 CORRECT = "correct"
 CONTINUE = "continue"

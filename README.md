@@ -20,7 +20,8 @@ In general: some libraries that were used in the assignment are previous project
 - 4 Constraint Propagation
 - 5 BackTracking
 - 6 Distributed Computation
-- 7 Results
+- 7 Evaluation
+  - 7.1 Statistics on Data
 - 8 Conclusions
 - 9 Bibliography
 
@@ -428,6 +429,25 @@ This is the history of many of the attempts that I've tried to improve performan
 
 
 
+### 7.1 Statistics on data
+
+
+
+Going deeper with our introspection we tried to search for common patetrns into the different datasets and give to the audience some useful insights that are not dependent from the machine on which im running tests, such as execution time.
+
+All the tests here achieved 100% accuracy on every test.
+
+All the tests are run with MOST_CONSTRAINED strategy
+
+
+
+| Num. Sudokus | Time in mins | Dataset    | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty |
+| ------------ | ------------ | ---------- | ------------------ | -------------------- | --------------- |
+| 1899         | 8.39         | WEBSCRAPED | 174.148            | 875.742              | 25.737          |
+| 100'000      | 8.250        | KAGGLE1M   | 0.41               | 7.05                 | 33.812          |
+
+
+
 ## 8 Conclusions
 
 In conclusion I can say that was very interesting and I think that probably the program can be faster distributing it using the python multiprocessing library natively. I didn't do that because actually it is already possible by putting the machine that is the master in the queue of the slaves. This is because the slaves natively works in multiprocessing. Other improvements are available such as using genetic algorithms and applying them can be very interesting.
@@ -451,3 +471,4 @@ The task was very interesting because it helped me putting a lot of knowledge in
 - [11] https://www.kaggle.com/rohanrao/sudoku
 - [12] https://www.w3resource.com/numpy/manipulation/squeeze.php
 - [13] https://docs.python.org/3/library/re.html
+

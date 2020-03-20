@@ -14,7 +14,7 @@ pickle.HIGHEST_PROTOCOL = 2
 from rq import Queue
 import time
 from scraper import download_sudokus, load_qqwing_sudokus
-from util import solve, Sudodata, parse_sudoku, print_distributed_results, cc
+from util import solve, Sudodata, parse_sudoku, print_distributed_results, cc, parse_sudoku_sol
 from antiplagiarism import antiplagiarism
 
 DISTRIBUTE = False
@@ -40,7 +40,7 @@ def main():
 		init = time.time()
 		count = 0
 		solved = 0
-		nrows = 100000
+		nrows = 500000
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
 		jobs = []
@@ -49,9 +49,9 @@ def main():
 		for i in dataset:
 			print("loading sudokus from kaggle's csv:", i)
 			ds = pd.read_csv("./sudoku_csvs/"+i,nrows=nrows)
-			for i in ds.iterrows():
-				curr_sudoku = parse_sudoku(i[1]["quizzes"])
-				sol_sudoku = parse_sudoku(i[1]["solutions"])
+			for j in ds.iterrows():
+				curr_sudoku = parse_sudoku(j[1]["quizzes"])
+				sol_sudoku = parse_sudoku_sol(j[1]["solutions"])
 
 				if DISTRIBUTE:
 					jobs.append(q.enqueue(solve, Sudodata(curr_sudoku,sol_sudoku)))
@@ -75,8 +75,8 @@ def main():
 		print("Tot of correct over all:", solved, "/", nrows)
 		print("Accuracy is: %.2f" % ((solved / nrows) * 100), "%")
 		print("Elapsed:", (time.time() - init) / 60, "min")
-		print("recursion count", cc.get_num_recursive_calls(), ", mean of recursions per sudoku:", cc.get_num_recursive_calls()/nrows)
-		print("constraint prop count", cc.get_num_constraints_prop_calls(), ", mean of constr. prop. per sudoku:", cc.get_num_constraints_prop_calls()/nrows)
+		print("recursion count", cc.get_num_recursive_calls(), ", mean of recursions per sudoku:", cc.get_num_recursive_calls()/nrows,"recs/sudoku")
+		print("constraint prop count", cc.get_num_constraints_prop_calls(), ", mean of constr. prop. per sudoku:", cc.get_num_constraints_prop_calls()/nrows,"const.props/sudoku")
 		print("Coefficient of mean difficulty is:", cc.get_num_occupied_cells()/nrows,"(higher means easier sudokus)")
 		print("----------------------------------------------------------")
 
@@ -121,9 +121,9 @@ def main():
 		print("Accuracy is: %.2f" % ((solved / num_sudoku_avail) * 100), "%")
 		print("Elapsed:", (time.time() - init) / 60, "min")
 		print("recursion count", cc.get_num_recursive_calls(), ", mean of recursions per sudoku:",
-			  cc.get_num_recursive_calls()/num_sudoku_avail)
+			  cc.get_num_recursive_calls()/num_sudoku_avail,"recs/sudoku")
 		print("constraint prop count", cc.get_num_constraints_prop_calls(), ", mean of constr. prop. per sudoku:",
-			  cc.get_num_constraints_prop_calls()/num_sudoku_avail)
+			  cc.get_num_constraints_prop_calls()/num_sudoku_avail,"const.props/sudoku")
 		print("Coefficient of mean difficulty is:", cc.get_num_occupied_cells()/num_sudoku_avail,"(higher means easier sudokus)")
 		print("----------------------------------------------------------")
 

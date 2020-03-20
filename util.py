@@ -126,6 +126,31 @@ def parse_sudoku(f):
 	return curr_sudoku
 
 
+def parse_sudoku_sol(f):
+	curr_sudoku = list([])
+
+	# linear
+	if type(f) == str:
+		f = [f[(i - 1) * 9:(9 * i)] for i in range(1, len(f) // 8)]
+
+	for j in f:
+		if j == "\n":
+			continue
+		if j == " \n":
+			continue
+		if j == " ":
+			continue
+
+		j = j.replace(" ", "")
+
+		# no spaces
+		if (j[1] != " ") and (j[3] != " "):
+			curr_sudoku += [[list(split(k)).map(to_int_sol) for k in [j.replace("\n", "")]][0]]
+
+	curr_sudoku = squeeze_all(curr_sudoku)
+	return curr_sudoku
+
+
 def split(word):
 	return [char for char in word]
 
@@ -137,6 +162,15 @@ def to_int(x):
 		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
 	else:
 		cc.occupied_cell_present()
+		return int(x)
+
+
+def to_int_sol(x):
+	if x == '0':
+		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
+	if x == '.':
+		return [1, 2, 3, 4, 5, 6, 7, 8, 9]
+	else:
 		return int(x)
 
 

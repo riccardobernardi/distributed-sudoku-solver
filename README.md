@@ -443,8 +443,9 @@ All the tests are run with MOST_CONSTRAINED strategy
 
 | Num. Sudokus | Time in mins | Dataset    | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty |
 | ------------ | ------------ | ---------- | ------------------ | -------------------- | --------------- |
-| 1899         | 8.39         | WEBSCRAPED | 174.148            | 875.742              | 25.737          |
-| 100'000      | 8.250        | KAGGLE1M   | 0.41               | 7.05                 | 33.812          |
+| 1899         | 8.39mins     | WEBSCRAPED | 174.148            | 875.742              | 25.737          |
+| 100'000      | 8.25mins     | KAGGLE1M   | 0.41               | 7.05                 | 33.812          |
+| 500'000      | 25mins       | KAGGLE1M   |                    |                      |                 |
 
 
 

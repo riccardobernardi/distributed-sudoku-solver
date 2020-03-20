@@ -445,10 +445,19 @@ All the tests are run with MOST_CONSTRAINED strategy
 | ------------ | ------------ | ---------- | ------------------ | -------------------- | --------------- | -------- |
 | 1899         | 8.39mins     | WEBSCRAPED | 174.148            | 875.742              | 25.737          | MOST     |
 | 100'000      | 8.25mins     | KAGGLE1M   | 0.41               | 7.05                 | 33.812          | MOST     |
-| 30           | 0.0733mins   |            |                    |                      |                 | MOST     |
-| 30           |              |            |                    |                      |                 | DEFAULT  |
-|              |              |            |                    |                      |                 | LEAST    |
-|              |              |            |                    |                      |                 |          |
+| 30           | 0.0733mins   | WEBSCRAPED | 105.67             | 533.34               | 25.8332         | MOST     |
+| 30           | 0.1834mins   | WEBSCRAPED | 248.867            | 1249.33              | 25.8332         | DEFAULT  |
+| 30           | too much     | WEBSCRAPED | -                  | -                    | 25.8332         | LEAST    |
+| 10           | 4.639mins    | WEBSCRAPED | 18249.1            | 91250.5              | 26.3            | LEAST    |
+| 30           | 0.15932mins  | KAGGLE1M   | 0.333              | 6.666                | 33.63           | MOST     |
+| 30           | 0.1573mins   | KAGGLE1M   | 0.333              | 6.666                | 33.63           | DEFAULT  |
+| 30           | 0.1721mins   | KAGGLE1M   | 0.333              | 6.666                | 33.63           | LEAST    |
+| 1000         | 0.1937mins   | KAGGLE1M   | 0.388              | 6.94                 | 33.753          | MOST     |
+| 1000         | 0.1950mins   | KAGGLE1M   | 0.414              | 7.07                 | 33.753          | LEAST    |
+| 1000         | 0.1932mins   | KAGGLE1M   | 0.39               | 6.95                 | 33.753          | DEFAULT  |
+| 10000        | 0.3709mins   | KAGGLE1M   | 0.4013             | 7.0065               | 33.8165         | MOST     |
+| 10000        | 0.3796mins   | KAGGLE1M   | 0.4263             | 7.1315               | 33.8165         | LEAST    |
+| 10000        | 0.3758mins   | KAGGLE1M   | 0.4062             | 7.031                | 33.8165         | DEFAULT  |
 
 
 

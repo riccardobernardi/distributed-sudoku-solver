@@ -20,8 +20,8 @@ from antiplagiarism import antiplagiarism
 DISTRIBUTE = False
 VIEW_RESULTS = False
 DOWNLOAD_DATA = False
-LOAD_KAGGLE = False
-WEBSCRAPED = True
+LOAD_KAGGLE = True
+WEBSCRAPED = False
 
 
 def main():
@@ -40,8 +40,8 @@ def main():
 		init = time.time()
 		count = 0
 		solved = 0
-		nrows = 200000 + 10000
-		skip = 200000
+		nrows = 0 + 100000
+		skip = 0
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)
 		jobs = []
@@ -89,7 +89,7 @@ def main():
 		init = time.time()
 		count = 0
 		solved = 0
-		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:30] # or ("norvig" in x))
+		dataset = list(os.listdir("./sudokus")).filter(lambda x: ".txt" in x)[:10] # or ("norvig" in x))
 		num_sudoku_avail = len(dataset)
 		c = Redis(host='192.168.1.237')
 		q = Queue(connection=c)

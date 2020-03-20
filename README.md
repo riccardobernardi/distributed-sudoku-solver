@@ -433,13 +433,29 @@ This is the history of many of the attempts that I've tried to improve performan
 
 
 
-Going deeper with our introspection we tried to search for common patetrns into the different datasets and give to the audience some useful insights that are not dependent from the machine on which im running tests, such as execution time.
-
-All the tests here achieved 100% accuracy on every test.
-
-All the tests are run with MOST_CONSTRAINED strategy
+In this deeper analysis we detached ourselves from the time that is machine-dependent and we preferred the parameters that are dependent only about the implementation. In the table below the reader can see the number of sudokus on which the tests are conducted and the relative dataset from which they belong. The name of the dataset is really really important because the WEBSCRAPED one is more and more difficult with respect to the kaggle's one. I just calculated the mean difficulty of the datasets and the reader can interpret it as "higher means easier". So it's easy to see that KAGGLE is 8 points easier than WEBSCRAPED. This 8 points of difference have to be interpreted as "8 cells more are already given", this means that KAGGLE puzzles are a lot easier with respect to WEBSCRAPED ones because they have 8 more cells yet filled. After this the other measures are average of recursions per sudoku, and average rounds of contraint propagations per sudoku. The strategy columns indicates which is the strategy that was used, default uses no special ordering so it is faster from the algorithmic complexity but it requires probably more recursions. The last column is about how many will be the rounds of propagation that will be applied to every sudoku at every recursion, this is a critical value because if it is too high than all the nested recursions will be very very slower but a too little value will put all computations into recursions. the reason why the number of propagations is fixed a-priori is becuase in my trials showed int he table above I proved that this fact enhances the performances! But I admit that the "adaptive" way of propagating constraints in more elegant, It is available obviously but not activated by default.
 
 
+
+We are going to talk about the tests on the KAGGLE1M dataset and this is because in that dataset the LEAST strategy is applicable because the dataset is very easy instead on the WEBSCRAPED (that contains the most difficult ones, up to [14], [15],[16] and [17]). This fact can be checked in the table below because the number of recursions and contraints are the highest ones: 
+
+| Num. Sudokus | Dataset    | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty | Strategy | Prop. Tries |
+| ------------ | ---------- | ------------------ | -------------------- | --------------- | -------- | ----------- |
+| 10           | WEBSCRAPED | 18249.1            | 91250.5              | 26.3            | LEAST    | 5           |
+
+the table above means that using the LEAST strategy on the most difficult puzzles it took on average 18249 recursions and 91250.
+
+
+
+For what concerns the KAGGLE1M dataset we can see that the algorithm is efficient because on the average on 100000 it takes only 11 constraint propagations to complete the puzzle and exaclty 0 recursions. We can also note that in many cases the DEFAULT strategy is more efficient with respect to the LEAST strategy and this is simple to be explained becuase we know that the LEAST ordering is not nice from the perspective of the recursion instead using the DEFAULT ordering is similar to the fact of having a random order because we can say that the 0-filled cells are in a certain sense randomly ordered.
+
+| Num. Sudokus | Dataset  | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty | Strategy | Prop. Tries |
+| ------------ | -------- | ------------------ | -------------------- | --------------- | -------- | ----------- |
+| 100000       | KAGGLE1M | 0.00122            | 11.01342             | 33.81248        | MOST     | 11          |
+
+
+
+All the tests here below achieved 100% accuracy on every test.
 
 | Num. Sudokus | Dataset    | Recursions /sudoku | Constr.props /sudoku | Mean Difficulty | Strategy | Prop. Tries |
 | ------------ | ---------- | ------------------ | -------------------- | --------------- | -------- | ----------- |
@@ -469,7 +485,10 @@ All the tests are run with MOST_CONSTRAINED strategy
 | 100000       | KAGGLE1M   | 0.00155            | 11.01705             | 33.81248        | DEFAULT  | 11          |
 | 100000       | KAGGLE1M   | 1.60018            | 7.80054              | 33.81248        | MOST     | 3           |
 | 100000       | KAGGLE1M   | 2.11849            | 9.35547              | 33.81248        | LEAST    | 3           |
-| 100000       | KAGGLE1M   |                    |                      | 33.81248        | DEFAULT  | 3           |
+| 100000       | KAGGLE1M   | 1.67568            | 8.02704              | 33.81248        | DEFAULT  | 3           |
+| 100000       | KAGGLE1M   | 8.51034            | 9.51034              | 33.81248        | MOST     | 1           |
+| 100000       | KAGGLE1M   |                    |                      | 33.81248        | LEAST    | 1           |
+| 100000       | KAGGLE1M   |                    |                      | 33.81248        | DEFAULT  | 1           |
 
 
 
@@ -496,4 +515,7 @@ The task was very interesting because it helped me putting a lot of knowledge in
 - [11] https://www.kaggle.com/rohanrao/sudoku
 - [12] https://www.w3resource.com/numpy/manipulation/squeeze.php
 - [13] https://docs.python.org/3/library/re.html
-
+- [14] http://lipas.uwasa.fi/~timan/sudoku/
+- [15] http://norvig.com/easy50.txt
+- [16] https://raw.githubusercontent.com/dimitri/sudoku/master/sudoku.txt
+- [17] https://projecteuler.net/project/resources/p096_sudoku.txt

@@ -465,8 +465,11 @@ All the tests are run with MOST_CONSTRAINED strategy
 | 100000       | KAGGLE1M   | 0.01215            | 8.0972               | 33.81248        | LEAST    | 8           |
 | 100000       | KAGGLE1M   | 0.00964            | 8.07712              | 33.81248        | DEFAULT  | 8           |
 | 100000       | KAGGLE1M   | 0.00122            | 11.01342             | 33.81248        | MOST     | 11          |
-| 100000       | KAGGLE1M   |                    |                      |                 | LEAST    | 11          |
-| 100000       | KAGGLE1M   |                    |                      |                 | DEFAULT  | 11          |
+| 100000       | KAGGLE1M   | 0.00374            | 11.04114             | 33.81248        | LEAST    | 11          |
+| 100000       | KAGGLE1M   | 0.00155            | 11.01705             | 33.81248        | DEFAULT  | 11          |
+| 100000       | KAGGLE1M   | 1.60018            | 7.80054              | 33.81248        | MOST     | 3           |
+| 100000       | KAGGLE1M   | 2.11849            | 9.35547              | 33.81248        | LEAST    | 3           |
+| 100000       | KAGGLE1M   |                    |                      | 33.81248        | DEFAULT  | 3           |
 
 
 

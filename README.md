@@ -487,8 +487,8 @@ All the tests here below achieved 100% accuracy on every test.
 | 100000       | KAGGLE1M   | 2.11849            | 9.35547              | 33.81248        | LEAST    | 3           |
 | 100000       | KAGGLE1M   | 1.67568            | 8.02704              | 33.81248        | DEFAULT  | 3           |
 | 100000       | KAGGLE1M   | 8.51034            | 9.51034              | 33.81248        | MOST     | 1           |
-| 100000       | KAGGLE1M   |                    |                      | 33.81248        | LEAST    | 1           |
-| 100000       | KAGGLE1M   |                    |                      | 33.81248        | DEFAULT  | 1           |
+| 100000       | KAGGLE1M   | 17.06548           | 18.06548             | 33.81248        | LEAST    | 1           |
+| 100000       | KAGGLE1M   | 10.15919           | 11.15919             | 33.81248        | DEFAULT  | 1           |
 
 
 

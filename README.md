@@ -441,3 +441,7 @@ The task was very interesting because it helped me putting a lot of knowledge in
 - [6] http://www.fabfile.org
 - [7] https://python-rq.org
 - [8] https://pypi.org/project/redis/
+- [9] https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+- [10] https://www.kaggle.com/bryanpark/sudoku
+- [11] https://www.kaggle.com/rohanrao/sudoku
+

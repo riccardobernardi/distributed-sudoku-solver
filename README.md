@@ -438,3 +438,6 @@ The task was very interesting because it helped me putting a lot of knowledge in
 - [3] https://medium.com/@machine.learning.language/anti-plagiarism-python-e5f259eb3f46
 - [4] https://medium.com/@machine.learning.language/pygraham-functional-methods-in-python-d5921208416a
 - [5] slides of the professor, part of "Local Search", slide number 34 of 61
+- [6] http://www.fabfile.org
+- [7] https://python-rq.org
+- [8] https://pypi.org/project/redis/

@@ -8,7 +8,7 @@ E-mail: 864018@stud.unive.it
 
 The code and the report were entirely developed only by Riccardo Bernardi.
 
-The author developed a library to program in a more functional way in python called pygraham so it is possible to find "list(...).map(...).reduce(...)". This construct is correct and it is introduced thanks to pygraham library, freely available on PyPI. It is present in the bibliography[4] an article that explains it.
+The author developed a library to program in a more functional way in python called pygraham so it is possible to find "list(...).map(...).reduce(...)". This construct is correct and it is introduced thanks to pygraham library, freely available on PyPI. The library overrides the builtin list class. It is present in the bibliography[4] an article that explains it.
 
 In general: some libraries that were used in the assignment are previous projects of the author published on PyPI, in these cases will be put references to the docs.
 
@@ -36,6 +36,8 @@ Some numbers at the start of the game are already provided on the sudoku and can
 Another important notice about sudokus is that a sudoku that is correct should have exactly one solution, this is very important because asserting this fact will allow us to search for a solution with the certainty of converging.
 
 Constraint Propagation is about taking the rules as written before and building a method that checks that fact, pruning wrong solutions from possible ones. In particular at the very start every 0 cell(void cells to be calculated) are substituted by an array [1...9] and the **propagate_constraints** function will prune wrong ones recursively.
+
+Constraints can be applied directly or indirectly. Directly means that we impose no equal digits on the same row/col/box. Indirect means that we impose every number from 1 to 9 have to be present in every row/col/box. In our case we exploit semantics of the sets in python to enforce both the constraints at the same time.
 
 In general we can implement the constrains propagation using the most-constrained strategy or the least one. It is known that the most-constrained strategy helps pruning the tree of recursion in the backtracking so it is the best choice[5].
 
@@ -189,7 +191,7 @@ One important part is the squeezing operation. At a certain moment in a certain 
 
 Example:
 
-1)
+1) We start by substituting every 0 with [1...9]. 
 
 ```
 [3, 7, [1, 2, 3, 4, 5, 6, 7, 8, 9], 5, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 6]
@@ -203,7 +205,7 @@ Example:
 [2, [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], [1, 2, 3, 4, 5, 6, 7, 8, 9], 5, [1, 2, 3, 4, 5, 6, 7, 8, 9], 6, 4]
 ```
 
-2)
+2) We start the first round of constraint propagation. Every constraint propagation round is about eliminating as many wrong choices as possible by row, col and box. At the end we do a squeezing[12].
 
 ```
 [3, 7, [8, 1, 2, 9], 5, 4, 2, [8, 9, 4], [8, 9, 4], 6]
@@ -217,7 +219,7 @@ Example:
 [2, [8, 1, 3], [8, 1, 7], 7, 1, 5, [8, 1, 3, 9], 6, 4]
 ```
 
-3)
+3) we continue propagating
 
 ```
 [3, 7, [8, 1, 9], 5, 4, 2, [8, 9], [8, 9], 6]
@@ -233,7 +235,7 @@ Example:
 
 [...] excluded some computed values
 
-11)
+10)
 
 ```
 [3, 7, 1, 5, 4, 2, 8, 9, 6]
@@ -247,7 +249,7 @@ Example:
 [2, 3, 8, 7, 1, 5, 9, 6, 4]
 ```
 
-12)
+11) After some rounds(11 rounds) the puzzle is solved. The time displayed here was successively improved. This puzzle is only an example because it is really easy but the real performances are computed on the most challenging ones. The program displays some statistics those were improved in the last version of the program providing also the forecasted duration of solving a pool of sudokus.
 
 ```
 [3, 7, 1, 5, 4, 2, 8, 9, 6]
@@ -357,8 +359,6 @@ if DISTRIBUTE:
 
 Here the code to check if a job is done and to retrieve its returning value from the RQ queue. The "job.return_value" will give you the resulting matrix computed on one of the N hosts.
 
-
-
 ```python
 excluded = set()
 while any(not job.is_finished for job in jobs):
@@ -377,7 +377,9 @@ for jj in jobs:
       solved += 1
 ```
 
+The library which provides me functionalities to connect to many slaves on-demand is called fabric[6].
 
+In case we use the kaggle library performances are worst if distributed but in case of webscraped ones performances are really better, this is because webscraped ones are less fast due to the IO operations neeeded to load every sudoku.
 
 
 
@@ -398,6 +400,7 @@ I achieved it by doing:
 - using pandas
 - precomputing indexes of the boxes
 - cutting out checks inside the recursion, for example there is only one "data.is_solved", this was studied in a way that the tradeoff cost/gain was as maximum as achievable .
+- many other smaller studies was conducted to take out best perfoarmances taking care of spatial, time complexity and related time of execution. The proof is here below, reading from the first row in the table until the last you will be able to track many of my experiments.
 
 
 
@@ -427,7 +430,9 @@ This is the history of many of the attempts that I've tried to improve performan
 
 ## 8 Conclusions
 
-The task was very interesting because it helped me putting a lot of knowledge into only one project, for example it was not mandatory but obviously was surely helpful to download many of the sudokus from the internet so I solved creating a webscraper, but also reading the data from the csvs with pandas. I also had the possibility of using 2 o my previous projects on a real environment. Finally I really enjoyed distributing all the jobs on the raspberrys.
+In conclusion I can say that was very interesting and I think that probably the program can be faster distributing it using the python multiprocessing library natively. I didn't do that because actually it is already possible by putting the machine that is the master in the queue of the slaves. This is because the slaves natively works in multiprocessing. Other improvements are available such as using genetic algorithms and applying them can be very interesting.
+
+The task was very interesting because it helped me putting a lot of knowledge into only one project, for example it was not mandatory but obviously was surely helpful to download many of the sudokus from the internet so I solved creating a webscraper, but also reading the data from the CSVs with pandas. I also had the possibility of using 2 o my previous projects on a real environment. Finally I really enjoyed distributing all the jobs on the raspberrys.
 
 
 
@@ -444,4 +449,4 @@ The task was very interesting because it helped me putting a lot of knowledge in
 - [9] https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 - [10] https://www.kaggle.com/bryanpark/sudoku
 - [11] https://www.kaggle.com/rohanrao/sudoku
-
+- [12] https://www.w3resource.com/numpy/manipulation/squeeze.php

@@ -497,11 +497,9 @@ All the tests here below achieved 100% accuracy on every test.
 
 Data below is taken from the above table with num sudoku = 100'000, dataset = KAGGLE1M and obviously difficulty = 33.81248.
 
-From the images below we can see that the MOST strategy beats all the others for a small number of propagation rounds and in general it beats all of them until the number of propagation rounds is small. When the number of propagation rounds is higher then the performances decrease for all the methods and no difference can be found.
+From the images below we can see that the MOST strategy beats all the others for a small number of propagation rounds. This can be seen from the graphs because the red line is the lower one, this is because lower line means less recursions and propagations that is obviously better. In general it beats all of them until the number of propagation rounds is small. When the number of propagation rounds is higher then the performances decrease for all the methods and no difference can be found.
 
-I remember that these tests are done on the sudokus provided by kaggle that seems to be very easy because otherwise on very difficult puzzles such as WEBSCRAPED the LEAST strategy takes too much time to complete.
-
-I remember that the x-axis is about the nummber of a-priori fixed propagation rounds. the number of propagation rounds can be also inferred or adaptively induced by the program but it is expensive and we decided for this better performing strategy. The other strategy is also available.
+I would like to remember the reader that these tests are done on the sudokus provided by kaggle that seems to be very easy because otherwise on very difficult puzzles such as WEBSCRAPED the LEAST strategy takes too much time to complete. Also the x-axis is about the number of a-priori fixed propagation rounds. The number of propagation rounds can be also inferred or adaptively induced by the program but it is expensive and we decided for this better performing strategy. The other strategy is also available.
 
 ![](/Users/rr/PycharmProjects/sudoku-solver-bernardi/graphics images/recursions.jpeg)
 

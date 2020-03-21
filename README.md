@@ -22,6 +22,7 @@ In general: some libraries that were used in the assignment are previous project
 - 6 Distributed Computation
 - 7 Evaluation
   - 7.1 Statistics on Data
+  - 7.2 Plotting results
 - 8 Conclusions
 - 9 Bibliography
 
@@ -491,6 +492,22 @@ All the tests here below achieved 100% accuracy on every test.
 | 100000       | KAGGLE1M   | 10.15919           | 11.15919             | 33.81248        | DEFAULT  | 1           |
 
 
+
+### 7.2 Plotting results
+
+Data below is taken from the above table with num sudoku = 100'000, dataset = KAGGLE1M and obviously difficulty = 33.81248.
+
+From the images below we can see that the MOST strategy beats all the others for a small number of propagation rounds and in general it beats all of them until the number of propagation rounds is small. When the number of propagation rounds is higher then the performances decrease for all the methods and no difference can be found.
+
+I remember that these tests are done on the sudokus provided by kaggle that seems to be very easy because otherwise on very difficult puzzles such as WEBSCRAPED the LEAST strategy takes too much time to complete.
+
+I remember that the x-axis is about the nummber of a-priori fixed propagation rounds. the number of propagation rounds can be also inferred or adaptively induced by the program but it is expensive and we decided for this better performing strategy. The other strategy is also available.
+
+![](/Users/rr/PycharmProjects/sudoku-solver-bernardi/graphics images/recursions.jpeg)
+
+Also here the same thing as above can be seen.
+
+![](/Users/rr/PycharmProjects/sudoku-solver-bernardi/graphics images/propagations.jpeg)
 
 ## 8 Conclusions
 

@@ -4,6 +4,8 @@ Author: Riccardo Bernardi
 
 E-mail: 864018@stud.unive.it
 
+![](/Users/rr/PycharmProjects/sudoku-solver-bernardi/distributed-sudoku-logo.png)
+
 ## Useful Info
 
 The code and the report were entirely developed only by Riccardo Bernardi.

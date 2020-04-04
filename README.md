@@ -4,7 +4,7 @@ Author: Riccardo Bernardi
 
 E-mail: 864018@stud.unive.it
 
-![](/Users/rr/PycharmProjects/sudoku-solver-bernardi/distributed-sudoku-logo.png)
+![](https://github.com/riccardobernardi/distributed-sudoku-solver/distributed-sudoku-logo.png)
 
 ## Useful Info
 
